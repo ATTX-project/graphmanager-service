@@ -116,8 +116,8 @@ uploadArchives {
             }
             pom.project {
                 version = "${artifactVersion}"
-                groupId = "${services}"
-                description "Graph Manager API."
+                groupId = "${serviceID}"
+                description "Graph Manager Service."
             }
         }
     }
