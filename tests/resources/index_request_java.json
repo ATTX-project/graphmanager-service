@@ -1,0 +1,18 @@
+{
+  "plugin": "java",
+  "targetEndpoint": {
+      "host": "localhost",
+      "port": 9200
+  },
+  "indexing": {
+      "filter": "{\"configs\":[{\"index\":\"uc1\",\"targets\":{\"http://data.hulib.helsinki.fi/attx/types/Infrastructure\":{\"type\":\"infra\",\"indexDoc\":{\"dataProperties\":[{\"sourceProperty\":\"http://purl.org/dc/terms/title\",\"targetProperty\":\"title\",\"isFunctional\":\"true\"}],\"multiLingualDataProperties\":[],\"objectProperties\":[{\"sourceProperty\":\"http://purl.org/dc/terms/identifier\",\"targetProperty\":\"identifier\",\"isFunctional\":\"true\"}]}},\"http://data.hulib.helsinki.fi/attx/types/Publication\":{\"type\":\"pub\",\"indexDoc\":{\"dataProperties\":[{\"sourceProperty\":\"http://purl.org/dc/terms/title\",\"targetProperty\":\"title\",\"isFunctional\":\"true\"},{\"sourceProperty\":\"http://purl.org/dc/terms/identifier\",\"targetProperty\":\"identifier\",\"isFunctional\":\"true\"}],\"multiLingualDataProperties\":[],\"objectProperties\":[]}}}}]}"
+  },
+  "graphStore": {
+      "endpoint": {
+          "host": "localhost",
+          "port": 3030,
+          "dataset": "ds"
+      },
+      "graphs": ["http://data.hulib.helsinki.fi/attx/ids", "http://data.hulib.helsinki.fi/attx/work1"]
+  }
+}

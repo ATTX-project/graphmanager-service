@@ -1,0 +1,170 @@
+---
+swagger: "2.0"
+info:
+  description: "ATTX GM internal API for orchestrating services and retrieving information from the Graph Store."
+  version: "0.1"
+  title: "ATTX GM API"
+  contact:
+    name: "ATTX project"
+    url: "https://www.helsinki.fi/en/projects/attx-2016"
+  license:
+    name: "MIT"
+basePath: "/"
+tags:
+- name: "GMservices"
+  description: "Services handled by GM"
+  externalDocs:
+    description: "just use it"
+    url: "https://attx-project.github.io/"
+- name: "GMgraph"
+  description: "Internal GM-API for graph store"
+  externalDocs:
+    description: "just use it"
+    url: "https://attx-project.github.io/"
+schemes:
+- "http"
+paths:
+  /health:
+    get:
+      description: "Get health of GM-API."
+      responses:
+        200:
+          description: "Successful response."
+  /{apiversion}/graph/query:
+    post:
+      tags:
+      - "GMgraph"
+      operationId: "graph_query"
+      description: "Send a SPARQL query to the Graph Store"
+      parameters:
+      - name: apiversion
+        in: path
+        required: true
+        type: "integer"
+      - in: "body"
+        name: "linking"
+        required: true
+        schema:
+          $ref: "#/definitions/Query"
+      responses:
+        200:
+          description: "Accepted."
+        400:
+          description: "Invalid Input."
+  /{apiversion}/graph/update:
+    post:
+      tags:
+      - "GMgraph"
+      operationId: "graph_update"
+      description: "Send an update query to the Graph Store."
+      parameters:
+      - name: apiversion
+        in: path
+        required: true
+        type: "integer"
+      - in: "body"
+        name: "linking"
+        required: true
+        schema:
+          $ref: "#/definitions/Update"
+      responses:
+        200:
+          description: "Accepted."
+        400:
+          description: "Invalid Input."
+  /{apiversion}/graph/list:
+    get:
+      tags:
+      - "GMgraph"
+      description: "Get list of Graphs."
+      produces:
+      - "application/json"
+      parameters:
+      - name: apiversion
+        in: path
+        required: true
+        type: "integer"
+      responses:
+        200:
+          description: "Successful response."
+          schema:
+            type: "object"
+        410:
+          description: "No Graphs available."
+  /{apiversion}/graph/statistics:
+    get:
+      tags:
+      - "GMgraph"
+      description: "Get statistics related to the Dataset."
+      produces:
+      - "application/json"
+      parameters:
+      - name: apiversion
+        in: path
+        required: true
+        type: "integer"
+      responses:
+        200:
+          description: "Successful response."
+          schema:
+            type: "object"
+        410:
+          description: "Statistics Unavailable."
+  /{apiversion}/graph:
+    get:
+      tags:
+      - "GMgraph"
+      description: "Get a named graph triples."
+      produces:
+      - "application/json"
+      parameters:
+      - name: apiversion
+        in: path
+        required: true
+        type: "integer"
+      - name: "uri"
+        in: "query"
+        description: "The named graph ID; must be a URI."
+        required: true
+        type: "string"
+        format: "int64"
+      responses:
+        200:
+          description: "Successful response."
+          schema:
+            type: "object"
+        410:
+          description: "Graph does not exist."
+    delete:
+      tags:
+      - "GMgraph"
+      description: "Delete graph with a certain ID."
+      parameters:
+      - name: "uri"
+        in: "query"
+        description: "The named graph ID; must be a URI."
+        required: true
+        type: "string"
+        format: "int64"
+      responses:
+        200:
+          description: "OK"
+definitions:
+  Query:
+    required:
+    - "namedGraph"
+    - "query"
+    properties:
+      namedGraph:
+        type: "string"
+      query:
+        type: "string"
+  Update:
+    required:
+    - "namedGraph"
+    - "triples"
+    properties:
+      namedGraph:
+        type: "string"
+      triples:
+        type: "string"

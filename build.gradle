@@ -1,0 +1,78 @@
+buildscript {
+    repositories {
+        jcenter()
+    }
+    dependencies {
+        classpath group: 'com.linkedin.pygradle', name: 'pygradle-plugin', version: '0.6.11'
+    }
+}
+
+apply plugin: 'maven'
+apply plugin: 'com.linkedin.python-cli'
+
+ext.version_nb = "2.0"
+
+version = "$version_nb"
+
+if (!project.hasProperty("env")) {
+    ext.artifactVersion = "${version_nb}-SNAPSHOT"
+} else if (project.env == "release"){
+    ext.artifactVersion = "${version_nb}"
+}
+
+python {
+    testDir = file('tests')
+    forceVersion('pypi', 'pytz', '2016.4')
+}
+// define an explicit installation sequence for the dependencies.
+// project.tasks.findByName('installPythonRequirements').sorted = false
+
+dependencies {
+    python 'pypi:pbr:3.1.1'
+    python 'pypi:pytz:2016.4'
+    python 'pypi:jsonschema:2.6.0'
+    // python 'pypi:elasticsearch:5.4.0'
+    python 'pypi:falcon:1.2.0'
+    python 'pypi:SPARQLWrapper:1.8.0'
+    python 'pypi:rdflib:4.2.2'
+    // python 'pypi:rdflib-jsonld:0.4.0'
+    python 'pypi:requests:2.18.1'
+    python 'pypi:requests-file:1.4.2'
+    python 'pypi:gunicorn:19.7.1'
+    python 'pypi:pytest-html:1.12.0'
+    // python 'pypi:PyLD:0.7.2'
+    python 'pypi:python-mimeparse:1.6.0'
+    python 'pypi:click:6.7'
+    python 'pypi:AMQPStorm:2.2.2'
+    test 'pypi:pbr:3.1.1'
+    test 'pypi:pytz:2016.4'
+    test 'pypi:mock:2.0.0'
+    test 'pypi:httpretty:0.8.14'
+}
+
+// Succesfully running the tests requires a logs folder existing.
+task creatFolders {
+    description = "Create logs and data folders."
+    doFirst {
+        mkdir('logs')
+        // mkdir('data')
+    }
+}
+
+buildPex.dependsOn creatFolders
+pytest.dependsOn creatFolders
+
+uploadArchives {
+    repositories {
+        mavenDeployer {
+            repository(url: "${artifactRepoURL}") {
+                  authentication(userName: "${artifactRepoUser}", password: "${artifactRepoPassword}")
+            }
+            pom.project {
+                version = "${artifactVersion}"
+                groupId = "${gmGroupID}"
+                description "Graph Manager API."
+            }
+        }
+    }
+}

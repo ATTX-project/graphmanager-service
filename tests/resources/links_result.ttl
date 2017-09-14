@@ -1,0 +1,19 @@
+@prefix schema: <http://schema.org/> .
+@prefix sd:    <http://www.w3.org/ns/sparql-service-description#> .
+@prefix rdf:   <http://www.w3.org/1999/02/22-rdf-syntax-ns#> .
+@prefix xml:   <http://www.w3.org/XML/1998/namespace> .
+@prefix attxonto: <http://data.hulib.helsinki.fi/attx/onto#> .
+@prefix xsd:   <http://www.w3.org/2001/XMLSchema#> .
+@prefix dcterms: <http://purl.org/dc/terms/> .
+@prefix skos:  <http://www.w3.org/2004/02/skos/core#> .
+@prefix pwo:   <http://purl.org/spar/pwo/> .
+@prefix attx:  <http://data.hulib.helsinki.fi/attx/> .
+@prefix rdfs:  <http://www.w3.org/2000/01/rdf-schema#> .
+@prefix prov:  <http://www.w3.org/ns/prov#> .
+@prefix dc:    <http://purl.org/dc/elements/1.1/> .
+
+<http://data.hulib.helsinki.fi/attx/3/work/infra/urn%3Anbn%3Afi%3Aresearch-infras-201607252>
+        skos:exactMatch  <http://data.hulib.helsinki.fi/tuhat/id/2fb64bc9-4b9f-4945-8e38-86f2dad19010> .
+
+<http://data.hulib.helsinki.fi/tuhat/id/2fb64bc9-4b9f-4945-8e38-86f2dad19010>
+        skos:exactMatch  <http://data.hulib.helsinki.fi/attx/3/work/infra/urn%3Anbn%3Afi%3Aresearch-infras-201607252> .

@@ -1,0 +1,21 @@
+{
+  "plugin": "python",
+  "targetEndpoint": {
+  	"host":"localhost",
+  	"port": 9200
+  },
+  "indexing": {
+  	"index": "default",
+  	"resourceType": "work",
+  	"indexingID": "dcterms:identifier",
+    "filter": "{\n  \"@context\": {\n    \"@vocab\": \"http://data.hulib.helsinki.fi/attx/\",\n    \"dcterms\": \"http://purl.org/dc/terms/\",\n    \"rdf\": \"http://www.w3.org/1999/02/22-rdf-syntax-ns#\",\n    \"rdfs\": \"http://www.w3.org/2000/01/rdf-schema#\",\n    \"xsd\": \"http://www.w3.org/2001/XMLSchema#\",\n    \"attx-types\": \"http://data.hulib.helsinki.fi/attx/types/\",\n    \"attx-types:Infrastructure\": {\n    \"@type\": \"@id\"\n  },\n    \"attx:hasclusteredID\": {\n      \"@id\": \"http://data.hulib.helsinki.fi/attx/id\"\n    }\n    ,\n    \"dcterms:identifier\": {\n      \"@type\": \"@id\",\n      \"@id\": \"http://purl.org/dc/terms/identifier\"\n    }\n  },\n  \"@type\": \"attx-types:Infrastructure\"\n}"
+  },
+  "graphStore": {
+  	"endpoint": {
+  		"host":"localhost",
+  		"port":3030,
+  		"dataset": "ds"
+  	},
+  	"graphs":["http://data.hulib.helsinki.fi/attx/ids", "http://data.hulib.helsinki.fi/attx/work1"]
+  }
+}
