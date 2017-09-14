@@ -20,6 +20,30 @@ if (!project.hasProperty("env")) {
     ext.artifactVersion = "${version_nb}"
 }
 
+ext {
+    imageRepo = "attx-dev"
+    artifactRepoPort = "8081"
+    pypiRepoPort = "5039"
+    serviceID = "org.uh.hulib.attx.services"
+}
+
+
+if (!project.hasProperty("artifactRepoURL")) {
+    ext.artifactRepoURL = "http://${imageRepo}:${artifactRepoPort}/repository/attx-releases"
+}
+
+if (!project.hasProperty("pypiURL")) {
+    ext.pypiURL = "http://${imageRepo}:${pypiRepoPort}/"
+}
+
+if (!project.hasProperty("artifactRepoUser")) {
+    ext.artifactRepoUser = ""
+}
+
+if (!project.hasProperty("artifactRepoPassword")) {
+    ext.artifactRepoPassword = ""
+}
+
 python {
     testDir = file('tests')
     forceVersion('pypi', 'pytz', '2016.4')
@@ -62,6 +86,28 @@ task creatFolders {
 buildPex.dependsOn creatFolders
 pytest.dependsOn creatFolders
 
+repositories {
+    // using a local repository
+    ivy{
+        name 'pypi-local'
+        url "/home/user/pivy/"
+        layout 'pattern' , {
+            artifact '[organisation]/[module]/[revision]/[artifact]-[revision](-[classifier]).[ext]'
+            ivy '[organisation]/[module]/[revision]/[module]-[revision].ivy'
+        }
+    }
+    // using a web repository
+    ivy{
+        name 'pypi-remote'
+        url "$pypiURL"
+        layout 'pattern' , {
+              artifact '[organisation]/[module]/[revision]/[artifact]-[revision](-[classifier]).[ext]'
+              ivy '[organisation]/[module]/[revision]/[module]-[revision].ivy'
+        }
+    }
+}
+
+
 uploadArchives {
     repositories {
         mavenDeployer {
@@ -70,7 +116,7 @@ uploadArchives {
             }
             pom.project {
                 version = "${artifactVersion}"
-                groupId = "${gmGroupID}"
+                groupId = "${services}"
                 description "Graph Manager API."
             }
         }
