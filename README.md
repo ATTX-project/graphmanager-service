@@ -14,8 +14,6 @@ Using the GM API Docker container:
 
 The version number is specified in `src/graph_manager/gmapi.py` under `version` variable.
 
-#  GraphManager Service server
-
 ## Overview
 The GM exposes information from the Graph Store to the Distribution component (Elasticsearch). It runs the mapping processing, clustering of IDs for the data and also it communicates with the Workflow API about the Provenance information in the Graph Store.
 
@@ -24,11 +22,7 @@ The GM API requires python 2.7 installed.
 ## API Endpoints
 
 The Graph Manager REST API has the following endpoints:
-* `index` - on given indexing parameters index the data from the Graph Store and insert it into Distribution Component endpoint;
-* `cluster` - cluster the IDs from the working data in the Graph Store;
-* `link` - retrieve the links in the Graph Store;
-* `linkstrategy` - retrieve either all or specific linking strategies from the Graph Store;
-* `prov` - retrieve provenance from the Workflow API and update the Graph Store with the provenance information.
+* `graph` - interface to the Fuseki Graph Store;
 * `health` - checks if the application is running.
 
 ## Develop
