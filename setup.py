@@ -156,9 +156,9 @@ setup(
         '': ['*.json']
     },
     include_package_data=True,
-    name='ATTXgmAPI',
+    name='ATTXgraphManager',
     # version='1.0.0',  # This is not read instead Gradle build version is used
-    description='ATTX Graph Manager API',
+    description='ATTX Graph Manager',
     entry_points='''
         [console_scripts]
         graphservice=graph_manager.graphservice:main
