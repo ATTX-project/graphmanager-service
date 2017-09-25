@@ -101,81 +101,73 @@ def retrieve_data(inputType, input_data):
 
 def construct_prov(message_data, status, startTime, endTime):
     """Construct GM related provenance message."""
-    try:
-        message = dict()
-        message["provenance"] = dict()
-        message["provenance"]["agent"] = dict()
-        message["provenance"]["agent"]["ID"] = artifact_id
-        message["provenance"]["agent"]["role"] = agent_role
+    message = dict()
+    message["provenance"] = dict()
+    message["provenance"]["agent"] = dict()
+    message["provenance"]["agent"]["ID"] = artifact_id
+    message["provenance"]["agent"]["role"] = agent_role
 
-        activityID = message_data["provenance"]["context"]["activityID"]
-        workflowID = message_data["provenance"]["context"]["workflowID"]
+    activityID = message_data["provenance"]["context"]["activityID"]
+    workflowID = message_data["provenance"]["context"]["workflowID"]
 
-        prov_message = message["provenance"]
+    prov_message = message["provenance"]
 
-        prov_message["context"] = dict()
-        prov_message["context"]["activityID"] = str(activityID)
-        prov_message["context"]["workflowID"] = str(workflowID)
-        if message_data["provenance"]["context"].get('stepID'):
-            prov_message["context"]["stepID"] = message_data["provenance"]["context"]["stepID"]
+    prov_message["context"] = dict()
+    prov_message["context"]["activityID"] = str(activityID)
+    prov_message["context"]["workflowID"] = str(workflowID)
+    if message_data["provenance"]["context"].get('stepID'):
+        prov_message["context"]["stepID"] = message_data["provenance"]["context"]["stepID"]
 
-        prov_message["activity"] = dict()
-        prov_message["activity"]["type"] = "ServiceExecution"
-        prov_message["activity"]["title"] = "Graph Manger Operations."
-        prov_message["activity"]["status"] = status
-        prov_message["activity"]["startTime"] = startTime
-        prov_message["activity"]["endTime"] = endTime
-        message["provenance"]["input"] = []
-        message["provenance"]["output"] = []
-        input_data = {
-            "key": "inputGraphs",
-            "role": "tempDataset"
+    prov_message["activity"] = dict()
+    prov_message["activity"]["type"] = "ServiceExecution"
+    prov_message["activity"]["title"] = "Graph Manger Operations."
+    prov_message["activity"]["status"] = status
+    prov_message["activity"]["startTime"] = startTime
+    prov_message["activity"]["endTime"] = endTime
+    message["provenance"]["input"] = []
+    message["provenance"]["output"] = []
+    input_data = {
+        "key": "inputGraphs",
+        "role": "tempDataset"
+    }
+    output_data = {
+        "key": "outputGraphs",
+        "role": "Dataset"
+    }
+    if message_data["payload"]["graphManagerInput"]["inputType"] == "Data":
+        message["payload"] = {
+            "inputGraphs": "attx:tempDataset",
+            "outputGraphs": message_data["payload"]["graphManagerInput"]["namedGraph"]
         }
-        output_data = {
-            "key": "outputGraphs",
-            "role": "Dataset"
+    elif message_data["payload"]["graphManagerInput"]["inputType"] == "URI":
+        message["payload"] = {
+            "inputGraphs": message_data["payload"]["graphManagerInput"]["input"],
+            "outputGraphs": message_data["payload"]["graphManagerInput"]["namedGraph"]
         }
-        if message_data["payload"]["graphManagerInput"]["inputType"] == "Data":
-            message["payload"] = {
-                "inputGraphs": "attx:tempDataset",
-                "outputGraphs": message_data["payload"]["graphManagerInput"]["namedGraph"]
-            }
-        elif message_data["payload"]["graphManagerInput"]["inputType"] == "URI":
-            message["payload"] = {
-                "inputGraphs": message_data["payload"]["graphManagerInput"]["input"],
-                "outputGraphs": message_data["payload"]["graphManagerInput"]["namedGraph"]
-            }
-        message["provenance"]["input"].append(input_data)
-        message["provenance"]["output"].append(output_data)
-        app_logger.info('Construct provenance metadata for Graph Manager.')
-        return message
-    except Exception as error:
-        app_logger.error('Something is wrong: {0}'.format(error))
-        raise error
+    message["provenance"]["input"].append(input_data)
+    message["provenance"]["output"].append(output_data)
+    app_logger.info('Construct provenance metadata for Graph Manager.')
+    return message
 
 
 def construct_response(provenance_data, output):
     """Construct Graph Manager response."""
-    try:
-        message = dict()
-        message["provenance"] = dict()
-        message["provenance"]["agent"] = dict()
-        message["provenance"]["agent"]["ID"] = artifact_id
-        message["provenance"]["agent"]["role"] = agent_role
+    message = dict()
+    message["provenance"] = dict()
+    message["provenance"]["agent"] = dict()
+    message["provenance"]["agent"]["ID"] = artifact_id
+    message["provenance"]["agent"]["role"] = agent_role
 
-        activityID = provenance_data["context"]["activityID"]
-        workflowID = provenance_data["context"]["workflowID"]
+    activityID = provenance_data["context"]["activityID"]
+    workflowID = provenance_data["context"]["workflowID"]
 
-        prov_message = message["provenance"]
+    prov_message = message["provenance"]
 
-        prov_message["context"] = dict()
-        prov_message["context"]["activityID"] = str(activityID)
-        prov_message["context"]["workflowID"] = str(workflowID)
-        if provenance_data["context"].get('stepID'):
-            prov_message["context"]["stepID"] = provenance_data["context"]["stepID"]
-        message["payload"] = dict()
-        message["payload"]["graphManagerOutput"] = output
-        return message
-    except Exception as error:
-        app_logger.error('Something is wrong: {0}'.format(error))
-        raise error
+    prov_message["context"] = dict()
+    prov_message["context"]["activityID"] = str(activityID)
+    prov_message["context"]["workflowID"] = str(workflowID)
+    if provenance_data["context"].get('stepID'):
+        prov_message["context"]["stepID"] = provenance_data["context"]["stepID"]
+    message["payload"] = dict()
+    message["payload"]["graphManagerOutput"] = output
+    return message

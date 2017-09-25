@@ -1,0 +1,16 @@
+{
+    "provenance": {
+        "context": {
+            "workflowID": "ingestionwf",
+            "activityID": 1,
+            "stepID": "replaceds"
+        }
+    },
+    "payload": {
+        "graphManagerInput": {
+            "namedGraph": "http://data.hulib.helsinki.fi/attx/strategy",
+            "input": "SELECT ?subject ?predicate ?object WHERE { ?subject ?predicate ?object} LIMIT 25",
+            "activity": "query"
+        }
+    }
+}

@@ -2,7 +2,9 @@ import click
 import unittest
 from graph_manager.app import init_api
 from click.testing import CliRunner
-from graph_manager.graphservice import GMApplication, number_of_workers
+from graph_manager.utils.messaging import ScalableRpcServer
+from graph_manager.graphservice import GMApplication, number_of_workers, main, rpc
+from mock import patch
 
 
 class TestAPIStart(unittest.TestCase):
@@ -43,6 +45,25 @@ class TestAPIStart(unittest.TestCase):
         """Test running app."""
         response = self.app.get('/')
         self.assertEqual(response.status_code, 404)
+
+    @patch.object(ScalableRpcServer, 'start_server')
+    def test_command_server(self, mock):
+        """Test Running server from command line."""
+        runner = CliRunner()
+        result = runner.invoke(rpc)
+        assert not result.exception
+
+    @patch('graph_manager.graphservice.cli')
+    def test_cli(self, mock):
+        """Test if cli was called."""
+        main()
+        self.assertTrue(mock.called)
+
+    @patch('graph_manager.utils.file')
+    def test_file(self, mock):
+        """Test if cli was called."""
+        mock('content', 'ttl')
+        self.assertTrue(mock.called)
 
 
 if __name__ == "__main__":

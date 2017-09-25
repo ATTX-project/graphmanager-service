@@ -5,11 +5,15 @@
         },
         "triples": {
             "type": "string"
+        },
+        "contentType": {
+            "type": "string"
         }
     },
     "required": [
         "triples",
-        "namedGraph"
+        "namedGraph",
+        "contentType"
     ],
     "type": "object"
 }

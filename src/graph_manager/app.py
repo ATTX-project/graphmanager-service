@@ -22,5 +22,5 @@ def init_api():
     return gm_app
 
 
-if __name__ == '__main__':
-    init_api()
+# if __name__ == '__main__':
+#     init_api()
