@@ -15,7 +15,8 @@ Using the Graph Manager Service Docker container:
 The version number is specified in `src/graph_manager/app.py` under `version` variable.
 
 ## Overview
-The GM exposes information from the Graph Store. It runs the mapping processing, clustering of IDs for the data and also it communicates with UnifiedViews plugins about the graph data information in the Graph Store.
+
+The Graph Manager manages interaction with the Graph Store and retrieving statistics about it (e.g. list of named graphs, number of queries) and also it communicates with UnifiedViews plugins about the graph data information in the Graph Store.
 
 The Graph Manager Service requires python 2.7 installed.
 
@@ -27,7 +28,7 @@ The Graph Manager REST API has the following endpoints:
 
 ## Develop
 
-### Build with Gradle
+### Building the Artifact with Gradle
 
 Install [gradle](https://gradle.org/install). The tasks available are listed below:
 
@@ -39,8 +40,9 @@ Install [gradle](https://gradle.org/install). The tasks available are listed bel
 
 To run the server, please execute the following (preferably in a virtual environment):
 ```
-pip install -r requirements
-python src/graph_manager/graphservice.py
+pip install -r pinned.txt
+python src/graph_manager/graphservice.py server
+python src/graph_manager/graphservice.py rpc
 ```
 in the `graph_manager` folder
 
