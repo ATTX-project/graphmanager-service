@@ -5,19 +5,19 @@ Current directory contains:
 
 VERSION: 0.2
 
-### GM API Docker container
+### Docker container
 
-Using the GM API Docker container:
-* `docker pull attxproject/graphmanager-service` in the current folder;
-* running the container `docker run -d -p 4302:4302 attxprojectgraphmanager-service` runs the container in detached mode on the `4302` port (production version should have this port hidden);
+Using the Graph Manager Service Docker container:
+* `docker pull attxproject/gm-api` in the current folder;
+* running the container `docker run -d -p 4302:4302 attxproject/gm-api` runs the container in detached mode on the `4302` port (production version should have this port hidden);
 * using the endpoints `http://localhost:4302/$versionNb/index` or `http://localhost:4302/$versionNb/clusterids` or the other listed below.
 
-The version number is specified in `src/graph_manager/gmapi.py` under `version` variable.
+The version number is specified in `src/graph_manager/app.py` under `version` variable.
 
 ## Overview
-The GM exposes information from the Graph Store to the Distribution component (Elasticsearch). It runs the mapping processing, clustering of IDs for the data and also it communicates with the Workflow API about the Provenance information in the Graph Store.
+The GM exposes information from the Graph Store. It runs the mapping processing, clustering of IDs for the data and also it communicates with UnifiedViews plugins about the graph data information in the Graph Store.
 
-The GM API requires python 2.7 installed.
+The Graph Manager Service requires python 2.7 installed.
 
 ## API Endpoints
 
@@ -40,17 +40,17 @@ Install [gradle](https://gradle.org/install). The tasks available are listed bel
 To run the server, please execute the following (preferably in a virtual environment):
 ```
 pip install -r requirements
-python src/gm_api/gmapi.py
+python src/graph_manager/graphservice.py
 ```
 in the `graph_manager` folder
 
-For testing purposes the application requires a running UnifiedViews, WF-API, Elasticsearch both 1.3.4 and Elasticsearch 5.x and Fuseki, one can make a request to the address below to view pipelines and associated steps:
+For testing purposes the application requires a running Fuseki, one can make a request to the address below to view pipelines and associated steps:
 
 ```
 http://localhost:4302/$versionNb/index
 ```
 
-The Swagger definition lives here:`gmAPI-swagger.yml`.
+The Swagger definition lives here:`swagger-gmAPI.yml`.
 
 
 ## Running Tests
