@@ -44,7 +44,6 @@ pip install -r pinned.txt
 python src/graph_manager/graphservice.py server
 python src/graph_manager/graphservice.py rpc
 ```
-in the `graph_manager` folder
 
 For testing purposes the application requires a running Fuseki, one can make a request to the address below to view pipelines and associated steps:
 
