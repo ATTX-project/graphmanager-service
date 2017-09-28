@@ -32,7 +32,7 @@ def server(host, port, log, workers):
 @cli.command('rpc')
 def rpc():
     """RPC server."""
-    RPC_SERVER = ScalableRpcServer(broker['host'], broker['user'], broker['pass'])
+    RPC_SERVER = ScalableRpcServer(broker['host'], broker['user'], broker['pass'], broker['rpcqueue'])
     RPC_SERVER.start_server()
 
 
