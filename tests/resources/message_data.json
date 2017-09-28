@@ -10,7 +10,7 @@
         "graphManagerInput": {
             "contentType": "text/turtle",
             "inputType": "Data",
-            "namedGraph": "default",
+            "targetGraph": "default",
             "input": "<http://example/egbook3> <http://purl.org/dc/elements/1.1/title> \"This is an example title 3153196587138\".",
             "activity": "replace"
         }

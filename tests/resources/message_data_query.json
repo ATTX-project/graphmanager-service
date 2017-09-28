@@ -8,7 +8,7 @@
     },
     "payload": {
         "graphManagerInput": {
-            "namedGraph": "http://data.hulib.helsinki.fi/attx/strategy",
+            "targetGraph": "http://data.hulib.helsinki.fi/attx/strategy",
             "input": "SELECT ?subject ?predicate ?object WHERE { ?subject ?predicate ?object} LIMIT 25",
             "activity": "query"
         }

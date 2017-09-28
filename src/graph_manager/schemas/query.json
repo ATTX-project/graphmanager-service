@@ -1,6 +1,6 @@
 {
     "properties": {
-        "namedGraph": {
+        "targetGraph": {
             "type": "string"
         },
         "query": {
@@ -9,7 +9,7 @@
     },
     "required": [
         "query",
-        "namedGraph"
+        "targetGraph"
     ],
     "type": "object"
 }

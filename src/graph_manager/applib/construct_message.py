@@ -17,7 +17,7 @@ def store_graph(message_data):
     """Store data in the Graph Store."""
     startTime = datetime.now().strftime('%Y-%m-%dT%H:%M:%S')
     storage = GraphStore()
-    named_graph = message_data["payload"]["graphManagerInput"]["namedGraph"]
+    named_graph = message_data["payload"]["graphManagerInput"]["targetGraph"]
     content_type = message_data["payload"]["graphManagerInput"]["contentType"]
     data = retrieve_data(message_data["payload"]["graphManagerInput"]["inputType"],
                          message_data["payload"]["graphManagerInput"]["input"])
@@ -38,7 +38,7 @@ def store_graph(message_data):
 def query_graph(message_data):
     """Query named graph in Graph Store."""
     storage = GraphStore()
-    named_graph = message_data["payload"]["graphManagerInput"]["namedGraph"]
+    named_graph = message_data["payload"]["graphManagerInput"]["targetGraph"]
     query = message_data["payload"]["graphManagerInput"]["input"]
     if named_graph == "default":
         request = storage.graph_sparql("", query)
@@ -51,7 +51,7 @@ def query_graph(message_data):
 def retrieve_graph(message_data):
     """Retrieve named graph from Graph Store."""
     storage = GraphStore()
-    named_graph = message_data["payload"]["graphManagerInput"]["namedGraph"]
+    named_graph = message_data["payload"]["graphManagerInput"]["targetGraph"]
     request = storage.retrieve_graph(named_graph)
     output = results_path(request, 'ttl')
     return construct_response(message_data["provenance"], output)
@@ -61,7 +61,7 @@ def replace_graph(message_data):
     """Store data in the Graph Store."""
     startTime = datetime.now().strftime('%Y-%m-%dT%H:%M:%S')
     storage = GraphStore()
-    named_graph = message_data["payload"]["graphManagerInput"]["namedGraph"]
+    named_graph = message_data["payload"]["graphManagerInput"]["targetGraph"]
     content_type = message_data["payload"]["graphManagerInput"]["contentType"]
     data = retrieve_data(message_data["payload"]["graphManagerInput"]["inputType"],
                          message_data["payload"]["graphManagerInput"]["input"])
@@ -137,12 +137,12 @@ def construct_prov(message_data, status, startTime, endTime):
     if message_data["payload"]["graphManagerInput"]["inputType"] == "Data":
         message["payload"] = {
             "inputGraphs": "attx:tempDataset",
-            "outputGraphs": message_data["payload"]["graphManagerInput"]["namedGraph"]
+            "outputGraphs": message_data["payload"]["graphManagerInput"]["targetGraph"]
         }
     elif message_data["payload"]["graphManagerInput"]["inputType"] == "URI":
         message["payload"] = {
             "inputGraphs": message_data["payload"]["graphManagerInput"]["input"],
-            "outputGraphs": message_data["payload"]["graphManagerInput"]["namedGraph"]
+            "outputGraphs": message_data["payload"]["graphManagerInput"]["targetGraph"]
         }
     message["provenance"]["input"].append(input_data)
     message["provenance"]["output"].append(output_data)
