@@ -60,7 +60,7 @@ class ConstructGraphTestCase(unittest.TestCase):
             replace_graph(message)
 
     @patch('graph_manager.applib.construct_message.Publisher.push')
-    @patch.object(GraphStore, 'graph_update')
+    @patch.object(GraphStore, 'graph_add')
     def test_store_called(self, mock, publish_mock):
         """Test if store graph data was called."""
         with open('tests/resources/message_data.json') as datafile:
@@ -68,7 +68,7 @@ class ConstructGraphTestCase(unittest.TestCase):
         store_graph(message)
         self.assertTrue(mock.called)
 
-    @patch.object(GraphStore, 'graph_update')
+    @patch.object(GraphStore, 'graph_add')
     def test_store_error(self, mock):
         """Test if store raises an error was called."""
         with open('tests/resources/message_data.json') as datafile:

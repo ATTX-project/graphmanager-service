@@ -64,7 +64,7 @@ class GraphUpdate(object):
     def on_post(self, req, resp, parsed):
         """Execution of the POST update query request."""
         fuseki = GraphStore()
-        resp.data = json.dumps(fuseki.graph_update(parsed['targetGraph'], parsed['triples'], parsed["contentType"]))
+        resp.data = json.dumps(fuseki.graph_add(parsed['targetGraph'], parsed['triples'], parsed["contentType"]))
         resp.content_type = 'application/json'
         resp.status = falcon.HTTP_200
         app_logger.info('Finished operations on /graph/update POST Request.')

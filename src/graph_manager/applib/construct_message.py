@@ -5,9 +5,10 @@ from datetime import datetime
 from graph_manager.utils.graph_store import GraphStore
 from graph_manager.utils.broker import broker
 from graph_manager.utils.messaging_publish import Publisher
-from graph_manager.utils.file import results_path
+from graph_manager.utils.file import results_path, file_extension
 from urlparse import urlparse
 from requests_file import FileAdapter
+from rdflib.graph import Graph
 
 artifact_id = 'GraphManger'  # Define the GraphManger agent
 agent_role = 'storage'  # Define Agent type
@@ -17,17 +18,18 @@ def store_graph(message_data):
     """Store data in the Graph Store."""
     startTime = datetime.now().strftime('%Y-%m-%dT%H:%M:%S')
     storage = GraphStore()
-    named_graph = message_data["payload"]["graphManagerInput"]["targetGraph"]
-    content_type = message_data["payload"]["graphManagerInput"]["contentType"]
-    data = retrieve_data(message_data["payload"]["graphManagerInput"]["inputType"],
-                         message_data["payload"]["graphManagerInput"]["input"])
+    target_graph = message_data["payload"]["graphManagerInput"]["targetGraph"]
+    source_graphs = message_data["payload"]["graphManagerInput"]["sourceData"]
     PUBLISHER = Publisher(broker['host'], broker['user'], broker['pass'], broker['provqueue'])
     try:
-        request = storage.graph_update(named_graph, data, content_type)
+        for graph in source_graphs:
+            content_type = graph["contentType"]
+            data = retrieve_data(graph["inputType"], graph["input"])
+            request = storage.graph_add(target_graph, data, content_type)
         endTime = datetime.now().strftime('%Y-%m-%dT%H:%M:%S')
         PUBLISHER.push(construct_prov(message_data, "success", startTime, endTime))
-        app_logger.info('Stored graph data in: {0} graph'.format(named_graph))
-        return construct_response(message_data["provenance"], request)
+        app_logger.info('Stored graph data in: {0} graph'.format(target_graph))
+        return construct_response(message_data["provenance"], json.dumps(request))
     except Exception as error:
         endTime = datetime.now().strftime('%Y-%m-%dT%H:%M:%S')
         PUBLISHER.push(construct_prov(message_data, "error", startTime, endTime))
@@ -38,23 +40,38 @@ def store_graph(message_data):
 def query_graph(message_data):
     """Query named graph in Graph Store."""
     storage = GraphStore()
-    named_graph = message_data["payload"]["graphManagerInput"]["targetGraph"]
+    source_graphs = message_data["payload"]["graphManagerInput"]["sourceGraphs"]
     query = message_data["payload"]["graphManagerInput"]["input"]
-    if named_graph == "default":
-        request = storage.graph_sparql("", query)
-    else:
-        request = storage.graph_sparql(named_graph, query)
-    output = results_path(request, 'xml')
-    return construct_response(message_data["provenance"], output)
+    output_type = message_data["payload"]["graphManagerInput"]["outputType"]
+    content_type = message_data["payload"]["graphManagerInput"]["contentType"]
+    request = storage.graph_sparql(source_graphs, query, content_type)
+    if output_type == "URI":
+        output = results_path(request, file_extension(content_type))
+    elif output_type == "Data":
+        output = request
+    output_obj = {"contentType": content_type,
+                  "outputType": output_type,
+                  "output": output}
+    return construct_response(message_data["provenance"], json.dumps(output_obj))
 
 
 def retrieve_graph(message_data):
     """Retrieve named graph from Graph Store."""
     storage = GraphStore()
-    named_graph = message_data["payload"]["graphManagerInput"]["targetGraph"]
-    request = storage.retrieve_graph(named_graph)
-    output = results_path(request, 'ttl')
-    return construct_response(message_data["provenance"], output)
+    result_graph = Graph()
+    source_graphs = message_data["payload"]["graphManagerInput"]["sourceGraphs"]
+    output_type = message_data["payload"]["graphManagerInput"]["outputType"]
+    content_type = message_data["payload"]["graphManagerInput"]["contentType"]
+    for graph in source_graphs:
+        result_graph.parse(data=storage.retrieve_graph(graph), format="turtle")
+    if output_type == "URI":
+        output = results_path(result_graph.serialize(format=content_type), file_extension(content_type))
+    elif output_type == "Data":
+        output = result_graph.serialize(format=content_type)
+    output_obj = {"contentType": content_type,
+                  "outputType": output_type,
+                  "output": output}
+    return construct_response(message_data["provenance"], json.dumps(output_obj))
 
 
 def replace_graph(message_data):
@@ -120,34 +137,34 @@ def construct_prov(message_data, status, startTime, endTime):
 
     prov_message["activity"] = dict()
     prov_message["activity"]["type"] = "ServiceExecution"
-    prov_message["activity"]["title"] = "Graph Manger Operations."
+    prov_message["activity"]["title"] = "Graph Manager Operations."
     prov_message["activity"]["status"] = status
     prov_message["activity"]["startTime"] = startTime
     prov_message["activity"]["endTime"] = endTime
     message["provenance"]["input"] = []
     message["provenance"]["output"] = []
-    input_data = {
-        "key": "inputGraphs",
-        "role": "tempDataset"
-    }
+    message["payload"] = {}
     output_data = {
-        "key": "outputGraphs",
+        "key": "outputGraph",
         "role": "Dataset"
     }
-    if message_data["payload"]["graphManagerInput"]["inputType"] == "Data":
-        message["payload"] = {
-            "inputGraphs": "attx:tempDataset",
-            "outputGraphs": message_data["payload"]["graphManagerInput"]["targetGraph"]
+    source_graphs = message_data["payload"]["graphManagerInput"]["sourceData"]
+
+    for graph in source_graphs:
+        input_data = {
+            "key": "inputGraphs_{0}".format(source_graphs.index(graph)),
+            "role": "tempDataset"
         }
-    elif message_data["payload"]["graphManagerInput"]["inputType"] == "URI":
-        message["payload"] = {
-            "inputGraphs": message_data["payload"]["graphManagerInput"]["input"],
-            "outputGraphs": message_data["payload"]["graphManagerInput"]["targetGraph"]
-        }
-    message["provenance"]["input"].append(input_data)
+        key = "inputGraphs_{0}".format(source_graphs.index(graph))
+        if graph["inputType"] == "Data":
+            message["payload"][key] = "attx:tempDataset"
+        if graph["inputType"] == "URI":
+            message["payload"][key] = graph["input"]
+        message["provenance"]["input"].append(input_data)
+    message["payload"]["outputGraph"] = message_data["payload"]["graphManagerInput"]["targetGraph"]
     message["provenance"]["output"].append(output_data)
     app_logger.info('Construct provenance metadata for Graph Manager.')
-    return message
+    return str(message)
 
 
 def construct_response(provenance_data, output):

@@ -2,7 +2,7 @@ import requests
 import os
 from urllib import quote
 from graph_manager.utils.logs import app_logger
-from SPARQLWrapper import SPARQLWrapper
+from SPARQLWrapper import SPARQLWrapper, JSON, XML
 
 
 class GraphStore(object):
@@ -83,22 +83,29 @@ class GraphStore(object):
             app_logger.info('Retrived named graph: {0} does not exist.'.format(named_graph))
             return None
 
-    def graph_sparql(self, named_graph, query):
+    def graph_sparql(self, source_graphs, query, content_type):
         """Execute SPARQL query on the Graph Store."""
         store_api = "{0}/query".format(self.request_address)
+        return_type = {'application/sparql-results+xml': XML,
+                       'application/sparql-results+json': JSON}
         try:
             sparql = SPARQLWrapper(store_api)
             # add a default graph, though that can also be in the query string
-            sparql.addDefaultGraph(named_graph)
+            for named_graph in source_graphs:
+                sparql.addDefaultGraph(named_graph)
+            sparql.setReturnFormat(return_type[content_type])
             sparql.setQuery(query)
             data = sparql.query().convert()
         except Exception as error:
             app_logger.error('Something is wrong: {0}'.format(error))
             raise error
         app_logger.info('Execture SPARQL query on named graph: {0}.'.format(named_graph))
-        return data.toxml()
+        if return_type[content_type] == JSON:
+            return data
+        else:
+            return data.toxml()
 
-    def graph_update(self, named_graph, data, content_type):
+    def graph_add(self, named_graph, data, content_type):
         """Update named graph in Graph Store."""
         headers = {'content-type': content_type,
                    'cache-control': "no-cache"}
