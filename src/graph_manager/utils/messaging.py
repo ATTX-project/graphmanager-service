@@ -5,7 +5,7 @@ import amqpstorm
 from amqpstorm import Message
 from amqpstorm import Connection
 from graph_manager.utils.logs import app_logger
-from graph_manager.applib.construct_message import store_graph, query_graph, replace_graph, retrieve_graph
+from graph_manager.applib.construct_message import add_message, query_message, replace_message, retrieve_message
 
 
 class ScalableRpcServer(object):
@@ -192,13 +192,13 @@ class Consumer(object):
             message_data = json.loads(message.body)
             action = message_data["payload"]["graphManagerInput"]["activity"]
             if action == "add":
-                response = str(store_graph(message_data))
+                response = str(add_message(message_data))
             elif action == "query":
-                response = str(query_graph(message_data))
+                response = str(query_message(message_data))
             elif action == "retrieve":
-                response = str(retrieve_graph(message_data))
+                response = str(retrieve_message(message_data))
             elif action == "replace":
-                response = str(replace_graph(message_data))
+                response = str(replace_message(message_data))
             properties = {
                 'correlation_id': message.correlation_id
             }

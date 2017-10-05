@@ -14,7 +14,7 @@ artifact_id = 'GraphManger'  # Define the GraphManger agent
 agent_role = 'storage'  # Define Agent type
 
 
-def store_graph(message_data):
+def add_message(message_data):
     """Store data in the Graph Store."""
     startTime = datetime.now().strftime('%Y-%m-%dT%H:%M:%S')
     storage = GraphStore()
@@ -25,19 +25,19 @@ def store_graph(message_data):
         for graph in source_graphs:
             content_type = graph["contentType"]
             data = retrieve_data(graph["inputType"], graph["input"])
-            request = storage.graph_add(target_graph, data, content_type)
+            storage.graph_add(target_graph, data, content_type)
         endTime = datetime.now().strftime('%Y-%m-%dT%H:%M:%S')
-        PUBLISHER.push(construct_prov(message_data, "success", startTime, endTime))
+        PUBLISHER.push(prov_message(message_data, "success", startTime, endTime))
         app_logger.info('Stored graph data in: {0} graph'.format(target_graph))
-        return construct_response(message_data["provenance"], json.dumps(request))
+        return response_message(message_data["provenance"], "success")
     except Exception as error:
         endTime = datetime.now().strftime('%Y-%m-%dT%H:%M:%S')
-        PUBLISHER.push(construct_prov(message_data, "error", startTime, endTime))
+        PUBLISHER.push(prov_message(message_data, "error", startTime, endTime))
         app_logger.error('Something is wrong: {0}'.format(error))
         raise error
 
 
-def query_graph(message_data):
+def query_message(message_data):
     """Query named graph in Graph Store."""
     storage = GraphStore()
     source_graphs = message_data["payload"]["graphManagerInput"]["sourceGraphs"]
@@ -52,10 +52,10 @@ def query_graph(message_data):
     output_obj = {"contentType": content_type,
                   "outputType": output_type,
                   "output": output}
-    return construct_response(message_data["provenance"], json.dumps(output_obj))
+    return response_message(message_data["provenance"], json.dumps(output_obj))
 
 
-def retrieve_graph(message_data):
+def retrieve_message(message_data):
     """Retrieve named graph from Graph Store."""
     storage = GraphStore()
     result_graph = Graph()
@@ -63,7 +63,7 @@ def retrieve_graph(message_data):
     output_type = message_data["payload"]["graphManagerInput"]["outputType"]
     content_type = message_data["payload"]["graphManagerInput"]["contentType"]
     for graph in source_graphs:
-        result_graph.parse(data=storage.retrieve_graph(graph), format="turtle")
+        result_graph.parse(data=storage.graph_retrieve(graph), format="turtle")
     if output_type == "URI":
         output = results_path(result_graph.serialize(format=content_type), file_extension(content_type))
     elif output_type == "Data":
@@ -71,27 +71,32 @@ def retrieve_graph(message_data):
     output_obj = {"contentType": content_type,
                   "outputType": output_type,
                   "output": output}
-    return construct_response(message_data["provenance"], json.dumps(output_obj))
+    return response_message(message_data["provenance"], json.dumps(output_obj))
 
 
-def replace_graph(message_data):
+def replace_message(message_data):
     """Store data in the Graph Store."""
     startTime = datetime.now().strftime('%Y-%m-%dT%H:%M:%S')
     storage = GraphStore()
-    named_graph = message_data["payload"]["graphManagerInput"]["targetGraph"]
-    content_type = message_data["payload"]["graphManagerInput"]["contentType"]
-    data = retrieve_data(message_data["payload"]["graphManagerInput"]["inputType"],
-                         message_data["payload"]["graphManagerInput"]["input"])
+    target_graph = message_data["payload"]["graphManagerInput"]["targetGraph"]
+    source_graphs = message_data["payload"]["graphManagerInput"]["sourceData"]
     PUBLISHER = Publisher(broker['host'], broker['user'], broker['pass'], broker['provqueue'])
     try:
-        request = storage.graph_replace(named_graph, data, content_type)
+        first_graph = next(iter(source_graphs or []), None)
+        first_graph_content_type = first_graph["contentType"]
+        first_graph_data = retrieve_data(first_graph["inputType"], first_graph["input"])
+        storage.graph_replace(target_graph, first_graph_data, first_graph_content_type)
+        for graph in source_graphs[1:]:
+            content_type = graph["contentType"]
+            data = retrieve_data(graph["inputType"], graph["input"])
+            storage.graph_add(target_graph, data, content_type)
         endTime = datetime.now().strftime('%Y-%m-%dT%H:%M:%S')
-        PUBLISHER.push(json.dumps(construct_prov(message_data, "success", startTime, endTime)))
-        app_logger.info('Stored graph data in: {0} graph'.format(named_graph))
-        return construct_response(message_data["provenance"], request)
+        PUBLISHER.push(prov_message(message_data, "success", startTime, endTime))
+        app_logger.info('Replaced graph data in: {0} graph'.format(target_graph))
+        return response_message(message_data["provenance"], "success")
     except Exception as error:
         endTime = datetime.now().strftime('%Y-%m-%dT%H:%M:%S')
-        PUBLISHER.push(json.dumps(construct_prov(message_data, "error", startTime, endTime)))
+        PUBLISHER.push(prov_message(message_data, "error", startTime, endTime))
         app_logger.error('Something is wrong: {0}'.format(error))
         raise error
 
@@ -116,7 +121,7 @@ def retrieve_data(inputType, input_data):
             raise error
 
 
-def construct_prov(message_data, status, startTime, endTime):
+def prov_message(message_data, status, startTime, endTime):
     """Construct GM related provenance message."""
     message = dict()
     message["provenance"] = dict()
@@ -167,7 +172,7 @@ def construct_prov(message_data, status, startTime, endTime):
     return str(message)
 
 
-def construct_response(provenance_data, output):
+def response_message(provenance_data, output):
     """Construct Graph Manager response."""
     message = dict()
     message["provenance"] = dict()

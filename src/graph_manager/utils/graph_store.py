@@ -69,7 +69,7 @@ class GraphStore(object):
         app_logger.info('Constructed statistics list for dataset: "/{0}".'.format(self.dataset))
         return result
 
-    def retrieve_graph(self, named_graph):
+    def graph_retrieve(self, named_graph):
         """Retrieve named graph from Graph Store."""
         try:
             request = requests.get("{0}/data?graph={1}".format(self.request_address, named_graph))

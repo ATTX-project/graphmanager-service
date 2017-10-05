@@ -5,11 +5,15 @@
         },
         "query": {
             "type": "string"
+        },
+        "contentType": {
+            "type": "string"
         }
     },
     "required": [
         "query",
-        "targetGraph"
+        "targetGraph",
+        "contentType"
     ],
     "type": "object"
 }

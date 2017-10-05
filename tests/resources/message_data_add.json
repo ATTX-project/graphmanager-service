@@ -8,14 +8,14 @@
     },
     "payload": {
         "graphManagerInput": {
-          "activity": "replace",
-          "targetGraph": "default",
+          "activity": "add",
+          "targetGraph": "http://work/dataset1",
           "sourceData":
           [
             {
               "contentType": "text/turtle",
-              "inputType": "URI",
-              "input": "file:///example.ttl"
+              "inputType": "Data",
+              "input": "<http://example.org/#spiderman> <http://www.perceive.net/schemas/relationship/enemyOf> <http://example.org/#green-goblin> ."
             },
             {
               "contentType": "application/n-triples",

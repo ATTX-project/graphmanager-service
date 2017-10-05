@@ -2,7 +2,7 @@ import json
 import unittest
 import httpretty
 from rdflib import Graph
-from graph_manager.applib.construct_message import retrieve_graph, query_graph, replace_graph, store_graph
+from graph_manager.applib.construct_message import replace_message, add_message, retrieve_message, query_message
 from mock import patch
 from graph_manager.utils.graph_store import GraphStore
 from amqpstorm import AMQPConnectionError
@@ -17,13 +17,15 @@ class ConstructGraphTestCase(unittest.TestCase):
         self.request_address = "http://localhost:3030/ds"
         pass
 
-    @patch('graph_manager.applib.construct_message.results_path')
-    @patch.object(GraphStore, 'retrieve_graph')
-    def test_retrieve_called(self, mock, file_mock):
+    @patch.object(GraphStore, 'graph_retrieve')
+    def test_retrieve_called(self, mock):
         """Test if retrieve graph data was called."""
-        with open('tests/resources/message_data.json') as datafile:
+        with open('tests/resources/graph_strategy.ttl') as datafile:
+            graph_data = datafile.read()
+        with open('tests/resources/message_data_retrieve.json') as datafile:
             message = json.load(datafile)
-        retrieve_graph(message)
+        mock.return_value = graph_data
+        retrieve_message(message)
         self.assertTrue(mock.called)
 
     @patch('graph_manager.applib.construct_message.results_path')
@@ -36,20 +38,26 @@ class ConstructGraphTestCase(unittest.TestCase):
         with open('tests/resources/message_data_query.json') as datafile:
             message = json.load(datafile)
         list_query = "select ?g (count(*) as ?count) {graph ?g {?s ?p ?o}} group by ?g"
-        url = "http://data.hulib.helsinki.fi/attx/strategy"
-        request_url = "{0}/query?default-graph-uri=%s&query={1}&output=xml&results=xml&format=xml".format(self.request_address, url, list_query)
-        httpretty.register_uri(httpretty.GET, request_url, graph_data, status=200, content_type="application/sparql-results+xml")
-        query_graph(message)
+        url1 = "http://data.hulib.helsinki.fi/attx/strategy"
+        request_url1 = "{0}/query?default-graph-uri=%s&query={1}&output=xml&results=xml&format=xml".format(self.request_address, url1, list_query)
+        httpretty.register_uri(httpretty.GET, request_url1, graph_data, status=200, content_type="application/sparql-results+xml")
+        url2 = "http://data.hulib.helsinki.fi/attx/attx-onto"
+        request_url2 = "{0}/query?default-graph-uri=%s&query={1}&output=xml&results=xml&format=xml".format(self.request_address, url2, list_query)
+        httpretty.register_uri(httpretty.GET, request_url2, graph_data, status=200, content_type="application/sparql-results+xml")
+        mock.return_value = graph_data
+        query_message(message)
         self.assertTrue(mock.called)
 
     @patch('graph_manager.applib.construct_message.Publisher.push')
+    @patch.object(GraphStore, 'graph_add')
     @patch.object(GraphStore, 'graph_replace')
-    def test_replace_called(self, mock, publish_mock):
+    def test_replace_called(self, mock1, mock2, publish_mock):
         """Test if replace graph data was called."""
         with open('tests/resources/message_data.json') as datafile:
             message = json.load(datafile)
-        replace_graph(message)
-        self.assertTrue(mock.called)
+        replace_message(message)
+        self.assertTrue(mock1.called)
+        self.assertTrue(mock2.called)
 
     @patch.object(GraphStore, 'graph_replace')
     def test_replace_error(self, mock):
@@ -57,72 +65,24 @@ class ConstructGraphTestCase(unittest.TestCase):
         with open('tests/resources/message_data.json') as datafile:
             message = json.load(datafile)
         with self.assertRaises(AMQPConnectionError):
-            replace_graph(message)
+            replace_message(message)
 
     @patch('graph_manager.applib.construct_message.Publisher.push')
     @patch.object(GraphStore, 'graph_add')
     def test_store_called(self, mock, publish_mock):
         """Test if store graph data was called."""
-        with open('tests/resources/message_data.json') as datafile:
+        with open('tests/resources/message_data_add.json') as datafile:
             message = json.load(datafile)
-        store_graph(message)
+        add_message(message)
         self.assertTrue(mock.called)
 
     @patch.object(GraphStore, 'graph_add')
     def test_store_error(self, mock):
         """Test if store raises an error was called."""
-        with open('tests/resources/message_data.json') as datafile:
+        with open('tests/resources/message_data_add.json') as datafile:
             message = json.load(datafile)
         with self.assertRaises(AMQPConnectionError):
-            store_graph(message)
-
-    # @patch('prov.applib.construct_prov.store_provenance')
-    # def test_store_prov_bad(self, mock):
-    #     """Test KeyError was raised."""
-    #     with open('tests/resources/prov_request_bad.json') as datafile:
-    #         graph_data = json.load(datafile)
-    #     with self.assertRaises(KeyError):
-    #         construct_provenance(graph_data["provenance"], graph_data["payload"])
-    #
-    # @patch('prov.applib.construct_prov.store_provenance')
-    # def test_prov_data_stored(self, mock):
-    #     """Test the resulting provenance graph."""
-    #     with open('tests/resources/prov_request.json') as datafile:
-    #         graph_data = json.load(datafile)
-    #     with open('tests/resources/prov_output.ttl') as datafile1:
-    #         graph_output = datafile1.read()
-    #     construct_provenance(graph_data["provenance"], graph_data["payload"])
-    #     mock.assert_called_with(graph_output)
-    #
-    # @patch('prov.applib.construct_prov.store_provenance')
-    # def test_prov_describe_data_stored(self, mock):
-    #     """Test the resulting provenance describe dataset."""
-    #     with open('tests/resources/prov_request_describe.json') as datafile:
-    #         graph_data = json.load(datafile)
-    #     with open('tests/resources/prov_output_describe.ttl') as datafile1:
-    #         graph_output = datafile1.read()
-    #     construct_provenance(graph_data["provenance"], graph_data["payload"])
-    #     mock.assert_called_with(graph_output)
-    #
-    # @patch('prov.applib.construct_prov.store_provenance')
-    # def test_prov_communication_data_stored(self, mock):
-    #     """Test the resulting provenance describe dataset."""
-    #     with open('tests/resources/prov_request_communication.json') as datafile:
-    #         graph_data = json.load(datafile)
-    #     with open('tests/resources/prov_output_communication.ttl') as datafile1:
-    #         graph_output = datafile1.read()
-    #     construct_provenance(graph_data["provenance"], graph_data["payload"])
-    #     mock.assert_called_with(graph_output)
-    #
-    # @patch('prov.applib.construct_prov.store_provenance')
-    # def test_prov_workflow_data_stored(self, mock):
-    #     """Test the resulting provenance describe dataset."""
-    #     with open('tests/resources/prov_request_workflow.json') as datafile:
-    #         graph_data = json.load(datafile)
-    #     with open('tests/resources/prov_output_workflow.ttl') as datafile1:
-    #         graph_output = datafile1.read()
-    #     construct_provenance(graph_data["provenance"], graph_data["payload"])
-    #     mock.assert_called_with(graph_output)
+            add_message(message)
 
 
 if __name__ == "__main__":
