@@ -34,7 +34,7 @@ def add_message(message_data):
         endTime = datetime.now().strftime('%Y-%m-%dT%H:%M:%S')
         PUBLISHER.push(prov_message(message_data, "error", startTime, endTime))
         app_logger.error('Something is wrong: {0}'.format(error))
-        raise error
+        raise
 
 
 def query_message(message_data):
@@ -98,7 +98,7 @@ def replace_message(message_data):
         endTime = datetime.now().strftime('%Y-%m-%dT%H:%M:%S')
         PUBLISHER.push(prov_message(message_data, "error", startTime, endTime))
         app_logger.error('Something is wrong: {0}'.format(error))
-        raise error
+        raise
 
 
 def retrieve_data(inputType, input_data):
@@ -118,7 +118,7 @@ def retrieve_data(inputType, input_data):
             return request.text
         except Exception as error:
             app_logger.error('Something is wrong: {0}'.format(error))
-            raise error
+            raise
 
 
 def prov_message(message_data, status, startTime, endTime):

@@ -31,6 +31,6 @@ def results_path(content, extension):
         return full_path
     except Exception as error:
         app_logger.error('Something is wrong: {0}'.format(error))
-        raise error
+        raise
     finally:
         f.close()

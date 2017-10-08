@@ -22,7 +22,3 @@ def init_api():
 
     main_logger.info('GM API is running.')
     return gm_app
-
-
-# if __name__ == '__main__':
-#     init_api()

@@ -199,6 +199,7 @@ class Consumer(object):
                 response = str(retrieve_message(message_data))
             elif action == "replace":
                 response = str(replace_message(message_data))
+
             properties = {
                 'correlation_id': message.correlation_id
             }
