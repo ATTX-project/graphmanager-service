@@ -3,6 +3,7 @@ import os
 from urllib import quote
 from graph_manager.utils.logs import app_logger
 from SPARQLWrapper import SPARQLWrapper, JSON, XML
+from requests.exceptions import ConnectionError
 
 
 class GraphStore(object):
@@ -20,14 +21,17 @@ class GraphStore(object):
 
     def graph_health(self):
         """Do the Health check for Graph Store."""
+        status = None
         try:
             request = requests.get("{0}ping".format(self.server_address))
         except Exception as error:
             app_logger.error('Something is wrong: {0}'.format(error))
-            return False
+            status = False
+            raise ConnectionError('Tried getting graph health, with error {}'.format(error))
         else:
             app_logger.info('Response from Graph Store is {0}'.format(request))
-            return True
+            status = True
+        return status
 
     def graph_list(self):
         """List Graph Store Named Graphs."""
