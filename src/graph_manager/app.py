@@ -1,7 +1,9 @@
 import falcon
 from graph_manager.api.healthcheck import HealthCheck
 from graph_manager.utils.logs import main_logger
-from graph_manager.api.graph_endpoint import GraphStatistics, GraphList, GraphResource, GraphSPARQL, GraphUpdate
+from graph_manager.api.graph_endpoint import GraphStatistics, GraphList
+from graph_manager.api.graph_endpoint import GraphResource, GraphSPARQL
+from graph_manager.api.graph_endpoint import GraphUpdate
 
 api_version = "0.2"  # TO DO: Figure out a better way to do versioning
 
@@ -20,7 +22,3 @@ def init_api():
 
     main_logger.info('GM API is running.')
     return gm_app
-
-
-# if __name__ == '__main__':
-#     init_api()

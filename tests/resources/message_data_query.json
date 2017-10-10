@@ -1,16 +1,18 @@
 {
     "provenance": {
         "context": {
-            "workflowID": "ingestionwf",
+            "workflowID": "wf",
             "activityID": 1,
-            "stepID": "replaceds"
+            "stepID": "stepid"
         }
     },
     "payload": {
         "graphManagerInput": {
-            "namedGraph": "http://data.hulib.helsinki.fi/attx/strategy",
-            "input": "SELECT ?subject ?predicate ?object WHERE { ?subject ?predicate ?object} LIMIT 25",
-            "activity": "query"
+          "activity": "query",
+          "contentType": "application/sparql-results+xml",
+          "outputType": "Data",
+          "sourceGraphs": ["http://data.hulib.helsinki.fi/attx/strategy", "http://data.hulib.helsinki.fi/attx/attx-onto"],
+          "input": "SELECT ?subject ?predicate ?object WHERE { ?subject ?predicate ?object} LIMIT 25"
         }
     }
 }

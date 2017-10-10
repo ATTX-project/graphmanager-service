@@ -83,12 +83,12 @@ class GraphTestCase(GraphStoreTest):
         assert(result.text == graph_data)
 
     @responses.activate
-    def test_api_graph_update(self):
+    def test_api_graph_add(self):
         """Test api update graph."""
         url = "http://data.hulib.helsinki.fi/attx/strategy"
-        with open('tests/resources/graph_update_request.json') as datafile:
+        with open('tests/resources/graph_add_request.json') as datafile:
             graph_data = datafile.read().replace('\n', '')
-        with open('tests/resources/graph_update_response.json') as datafile:
+        with open('tests/resources/graph_add_response.json') as datafile:
             response_data = json.load(datafile)
 
         def request_callback1(request):
@@ -165,9 +165,9 @@ class GraphTestCase(GraphStoreTest):
         assert(result.status == falcon.HTTP_400)
 
     @responses.activate
-    def test_api_update_bad(self):
+    def test_api_add_bad(self):
         """Test prov bad input."""
-        with open('tests/resources/graph_update_request_bad.json') as datafile:
+        with open('tests/resources/graph_add_request_bad.json') as datafile:
             graph_data = datafile.read().replace('\n', '')
         hdrs = [('Accept', 'application/json'),
                 ('Content-Type', 'application/json'), ]

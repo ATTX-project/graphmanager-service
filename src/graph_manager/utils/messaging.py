@@ -5,7 +5,7 @@ import amqpstorm
 from amqpstorm import Message
 from amqpstorm import Connection
 from graph_manager.utils.logs import app_logger
-from graph_manager.applib.construct_message import store_graph, query_graph, replace_graph, retrieve_graph
+from graph_manager.applib.construct_message import add_message, query_message, replace_message, retrieve_message
 
 
 class ScalableRpcServer(object):
@@ -182,6 +182,20 @@ class Consumer(object):
         if self.channel:
             self.channel.close()
 
+    def handle_message(self, message):
+        """Handle graph manager messages."""
+        message_data = json.loads(message.body)
+        action = message_data["payload"]["graphManagerInput"]["activity"]
+        if action == "add":
+            response = add_message(message_data)
+        elif action == "query":
+            response = query_message(message_data)
+        elif action == "retrieve":
+            response = retrieve_message(message_data)
+        elif action == "replace":
+            response = replace_message(message_data)
+        return str(response)
+
     def __call__(self, message):
         """Process the RPC Payload.
 
@@ -189,23 +203,22 @@ class Consumer(object):
         :return:
         """
         try:
-            message_data = json.loads(message.body)
-            action = message_data["payload"]["graphManagerInput"]["activity"]
-            if action == "add":
-                response = str(store_graph(message_data))
-            elif action == "query":
-                response = str(query_graph(message_data))
-            elif action == "retrieve":
-                response = str(retrieve_graph(message_data))
-            elif action == "replace":
-                response = str(replace_graph(message_data))
+            processed_message = self.handle_message(message)
+        except Exception as e:
+            app_logger.error('Something went wrong: {0}'.format(e))
             properties = {
                 'correlation_id': message.correlation_id
             }
-
-            response = Message.create(message.channel, response, properties)
+            error_message = "Error Type: {0}, with message: {1}".format(e.__class__.__name__, e.message)
+            processed_message = {"status": "Error",
+                                 "statusMessage": error_message}
+            response = Message.create(message.channel, str(processed_message), properties)
             response.publish(message.reply_to)
-
+            message.reject(requeue=False)
+        else:
+            properties = {
+                'correlation_id': message.correlation_id
+            }
+            response = Message.create(message.channel, processed_message, properties)
+            response.publish(message.reply_to)
             message.ack()
-        except Exception as e:
-            app_logger.error('Something went wrong: {0}'.format(e))

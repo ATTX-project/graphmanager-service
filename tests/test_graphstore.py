@@ -94,7 +94,7 @@ class GraphTestCase(GraphStoreTest):
         """Test graph retrieve non-existent graph."""
         responses.add(responses.GET, "{0}/data?graph={1}".format(self.request_address, "http://test.com"), status=404)
         fuseki = GraphStore()
-        result = fuseki.retrieve_graph("default")
+        result = fuseki.graph_retrieve("default")
         self.assertIsNone(result)
 
     @responses.activate
@@ -105,7 +105,7 @@ class GraphTestCase(GraphStoreTest):
         url = "http://data.hulib.helsinki.fi/attx/strategy"
         responses.add(responses.GET, "{0}/data?graph={1}".format(self.request_address, url), body=graph_data, status=200)
         fuseki = GraphStore()
-        result = fuseki.retrieve_graph("http://data.hulib.helsinki.fi/attx/strategy")
+        result = fuseki.graph_retrieve("http://data.hulib.helsinki.fi/attx/strategy")
         assert(result == graph_data)
 
     @responses.activate
@@ -113,14 +113,14 @@ class GraphTestCase(GraphStoreTest):
         """Test ConnectionError graph retrieve on graph endpoint."""
         fuseki = GraphStore()
         with self.assertRaises(ConnectionError):
-            fuseki.retrieve_graph("default")
+            fuseki.graph_retrieve("default")
 
     @responses.activate
-    def test_graph_update(self):
+    def test_graph_add(self):
         """Test update graph."""
         url = "http://data.hulib.helsinki.fi/attx/strategy"
         graph_data = "<http://example/egbook3> <http://purl.org/dc/elements/1.1/title>  \"This is an example title\""
-        with open('tests/resources/graph_update_response.json') as datafile:
+        with open('tests/resources/graph_add_response.json') as datafile:
             response_data = json.load(datafile)
 
         def request_callback(request):
@@ -135,22 +135,22 @@ class GraphTestCase(GraphStoreTest):
             content_type='text/turtle',
         )
         fuseki = GraphStore()
-        result = fuseki.graph_update(url, graph_data, "text/turtle")
+        result = fuseki.graph_add(url, graph_data, "text/turtle")
         assert(result == response_data)
 
     @responses.activate
-    def test_graph_update_bad(self):
+    def test_graph_add_bad(self):
         """Test ConnectionError graph update on graph endpoint."""
         fuseki = GraphStore()
         with self.assertRaises(ConnectionError):
-            fuseki.graph_update("default", "", "text/turtle")
+            fuseki.graph_add("default", "", "text/turtle")
 
     @responses.activate
     def test_graph_replace(self):
         """Test replace graph."""
         url = "http://data.hulib.helsinki.fi/attx/strategy"
         graph_data = "<http://example/egbook3> <http://purl.org/dc/elements/1.1/title>  \"This is an example title\""
-        with open('tests/resources/graph_update_response.json') as datafile:
+        with open('tests/resources/graph_add_response.json') as datafile:
             response_data = json.load(datafile)
 
         responses.add(
@@ -207,7 +207,7 @@ class GraphTestCase(GraphStoreTest):
         request_url = "{0}/query?default-graph-uri=%s&query={1}&output=xml&results=xml&format=xml".format(self.request_address, url, list_query)
         httpretty.register_uri(httpretty.GET, request_url, graph_data, status=200, content_type="application/sparql-results+xml")
         fuseki = GraphStore()
-        result = fuseki.graph_sparql(url, list_query)
+        result = fuseki.graph_sparql(url, list_query, 'application/sparql-results+xml')
         assert(result == graph_data)
 
     @responses.activate
@@ -216,7 +216,7 @@ class GraphTestCase(GraphStoreTest):
         list_query = quote("select ?g (count(*) as ?count) {graph ?g {?s ?p ?o}} group by ?g")
         fuseki = GraphStore()
         with self.assertRaises(URLError):
-            fuseki.graph_sparql("default", list_query)
+            fuseki.graph_sparql("default", list_query, 'application/sparql-results+xml')
 
 
 if __name__ == "__main__":

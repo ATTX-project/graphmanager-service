@@ -2,7 +2,8 @@ import requests
 import os
 from urllib import quote
 from graph_manager.utils.logs import app_logger
-from SPARQLWrapper import SPARQLWrapper
+from SPARQLWrapper import SPARQLWrapper, JSON, XML
+from requests.exceptions import ConnectionError
 
 
 class GraphStore(object):
@@ -20,14 +21,17 @@ class GraphStore(object):
 
     def graph_health(self):
         """Do the Health check for Graph Store."""
+        status = None
         try:
             request = requests.get("{0}ping".format(self.server_address))
         except Exception as error:
             app_logger.error('Something is wrong: {0}'.format(error))
-            return False
+            status = False
+            raise ConnectionError('Tried getting graph health, with error {}'.format(error))
         else:
             app_logger.info('Response from Graph Store is {0}'.format(request))
-            return True
+            status = True
+        return status
 
     def graph_list(self):
         """List Graph Store Named Graphs."""
@@ -38,7 +42,7 @@ class GraphStore(object):
             request = requests.get("{0}/sparql?query={1}".format(self.request_address, list_query))
         except Exception as error:
             app_logger.error('Something is wrong: {0}'.format(error))
-            raise error
+            raise
         graphs = request.json()
         result['graphsCount'] = len(graphs['results']['bindings'])
         for g in graphs['results']['bindings']:
@@ -55,7 +59,7 @@ class GraphStore(object):
             request = requests.get("{0}stats/{1}".format(self.server_address, self.dataset), auth=('admin', self.key))
         except Exception as error:
             app_logger.error('Something is wrong: {0}'.format(error))
-            raise error
+            raise
         stats = request.json()
         result['dataset'] = "/{0}".format(self.dataset)
         result['requests'] = {}
@@ -69,13 +73,13 @@ class GraphStore(object):
         app_logger.info('Constructed statistics list for dataset: "/{0}".'.format(self.dataset))
         return result
 
-    def retrieve_graph(self, named_graph):
+    def graph_retrieve(self, named_graph):
         """Retrieve named graph from Graph Store."""
         try:
             request = requests.get("{0}/data?graph={1}".format(self.request_address, named_graph))
         except Exception as error:
             app_logger.error('Something is wrong: {0}'.format(error))
-            raise error
+            raise
         if request.status_code == 200:
             app_logger.info('Retrived named graph: {0}.'.format(named_graph))
             return request.text
@@ -83,22 +87,29 @@ class GraphStore(object):
             app_logger.info('Retrived named graph: {0} does not exist.'.format(named_graph))
             return None
 
-    def graph_sparql(self, named_graph, query):
+    def graph_sparql(self, source_graphs, query, content_type):
         """Execute SPARQL query on the Graph Store."""
         store_api = "{0}/query".format(self.request_address)
+        return_type = {'application/sparql-results+xml': XML,
+                       'application/sparql-results+json': JSON}
         try:
             sparql = SPARQLWrapper(store_api)
             # add a default graph, though that can also be in the query string
-            sparql.addDefaultGraph(named_graph)
+            for named_graph in source_graphs:
+                sparql.addDefaultGraph(named_graph)
+            sparql.setReturnFormat(return_type[content_type])
             sparql.setQuery(query)
             data = sparql.query().convert()
         except Exception as error:
             app_logger.error('Something is wrong: {0}'.format(error))
-            raise error
+            raise
         app_logger.info('Execture SPARQL query on named graph: {0}.'.format(named_graph))
-        return data.toxml()
+        if return_type[content_type] == JSON:
+            return data
+        else:
+            return data.toxml()
 
-    def graph_update(self, named_graph, data, content_type):
+    def graph_add(self, named_graph, data, content_type):
         """Update named graph in Graph Store."""
         headers = {'content-type': content_type,
                    'cache-control': "no-cache"}
@@ -106,7 +117,7 @@ class GraphStore(object):
             request = requests.post("{0}/data?graph={1}".format(self.request_address, named_graph), data=data, headers=headers)
         except Exception as error:
             app_logger.error('Something is wrong: {0}'.format(error))
-            raise error
+            raise
         app_logger.info('Updated named graph: {0}.'.format(named_graph))
         return request.json()
 
@@ -118,7 +129,7 @@ class GraphStore(object):
             request = requests.put("{0}?graph={1}".format(self.request_address, named_graph), data=data, headers=headers)
         except Exception as error:
             app_logger.error('Something is wrong: {0}'.format(error))
-            raise error
+            raise
         app_logger.info('Replaced named graph: {0}.'.format(named_graph))
         return request.json()
 
@@ -132,6 +143,6 @@ class GraphStore(object):
             request = requests.post("{0}/update".format(self.request_address), data=payload, headers=headers)
         except Exception as error:
             app_logger.error('Something is wrong: {0}'.format(error))
-            raise error
+            raise
         app_logger.info('Deleted named graph: {0}.'.format(named_graph))
         return request.text

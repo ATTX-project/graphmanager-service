@@ -1,6 +1,6 @@
 {
     "properties": {
-        "namedGraph": {
+        "targetGraph": {
             "type": "string"
         },
         "triples": {
@@ -12,7 +12,7 @@
     },
     "required": [
         "triples",
-        "namedGraph",
+        "targetGraph",
         "contentType"
     ],
     "type": "object"

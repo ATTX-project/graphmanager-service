@@ -37,7 +37,7 @@ class GraphResource(object):
         """Execution of the GET named graph request."""
         graphURI = req.get_param('uri')
         fuseki = GraphStore()
-        response = fuseki.retrieve_graph(graphURI)
+        response = fuseki.graph_retrieve(graphURI)
         if response is not None:
             resp.data = str(response)
             resp.content_type = 'text/turtle'
@@ -64,7 +64,7 @@ class GraphUpdate(object):
     def on_post(self, req, resp, parsed):
         """Execution of the POST update query request."""
         fuseki = GraphStore()
-        resp.data = json.dumps(fuseki.graph_update(parsed['namedGraph'], parsed['triples'], parsed["contentType"]))
+        resp.data = json.dumps(fuseki.graph_add(parsed['targetGraph'], parsed['triples'], parsed["contentType"]))
         resp.content_type = 'application/json'
         resp.status = falcon.HTTP_200
         app_logger.info('Finished operations on /graph/update POST Request.')
@@ -77,7 +77,7 @@ class GraphSPARQL(object):
     def on_post(self, req, resp, parsed):
         """Execution of the POST SPARQL query request."""
         fuseki = GraphStore()
-        data = fuseki.graph_sparql(parsed['namedGraph'], parsed['query'])
+        data = fuseki.graph_sparql(parsed['targetGraph'], parsed['query'], parsed["contentType"])
         resp.data = str(data)
         resp.content_type = 'application/xml'  # for now just this type
         resp.status = falcon.HTTP_200

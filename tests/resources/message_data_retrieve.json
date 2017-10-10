@@ -1,0 +1,20 @@
+{
+    "provenance": {
+        "context": {
+            "workflowID": "wf",
+            "activityID": 1,
+            "stepID": "stepid"
+        }
+    },
+    "payload": {
+        "graphManagerInput": {
+          "activity": "retrieve",
+          "contentType": "text/turtle",
+          "outputType": "Data",
+          "sourceGraphs":
+          [
+              "http://data.hulib.helsinki.fi/attx/strategy"
+          ]
+        }
+    }
+}
