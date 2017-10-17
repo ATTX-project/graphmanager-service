@@ -10,7 +10,7 @@ from urlparse import urlparse
 from requests_file import FileAdapter
 from rdflib.graph import Graph
 
-artifact_id = 'GraphManger'  # Define the GraphManger agent
+artifact_id = 'GraphManager'  # Define the GraphManager agent
 agent_role = 'storage'  # Define Agent type
 
 
