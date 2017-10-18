@@ -101,6 +101,18 @@ def replace_message(message_data):
         raise
 
 
+def handle_fileAdapter(request, input_data):
+    """Handle file adapter response."""
+    if request.status_code == 404:
+        raise IOError("Something went wrong with retrieving the file: {0}. It does not exist!".format(input_data))
+    elif request.status_code == 403:
+        raise IOError("Something went wrong with retrieving the file: {0}. Accessing it is not permitted!".format(input_data))
+    elif request.status_code == 400:
+        raise IOError("Something went wrong with retrieving the file: {0}. General IOError!".format(input_data))
+    elif request.status_code == 200:
+        return request.text
+
+
 def retrieve_data(inputType, input_data):
     """Retrieve data from a specific URI."""
     s = requests.Session()
@@ -112,10 +124,11 @@ def retrieve_data(inputType, input_data):
         try:
             if urlparse(input_data).scheme in allowed:
                 request = s.get(input_data)
+                return request.text
             elif urlparse(input_data).scheme in local:
                 s.mount('file://', FileAdapter())
                 request = s.get(input_data)
-            return request.text
+                handle_fileAdapter(request, input_data)
         except Exception as error:
             app_logger.error('Something is wrong: {0}'.format(error))
             raise

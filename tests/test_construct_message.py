@@ -49,15 +49,25 @@ class ConstructGraphTestCase(unittest.TestCase):
         self.assertTrue(mock.called)
 
     @patch('graph_manager.applib.construct_message.Publisher.push')
-    @patch.object(GraphStore, 'graph_add')
+    # @patch.object(GraphStore, 'graph_add')
     @patch.object(GraphStore, 'graph_replace')
-    def test_replace_called(self, mock1, mock2, publish_mock):
+    def test_replace_called(self, mock1, publish_mock):
         """Test if replace graph data was called."""
         with open('tests/resources/message_data.json') as datafile:
             message = json.load(datafile)
         replace_message(message)
         self.assertTrue(mock1.called)
-        self.assertTrue(mock2.called)
+        # self.assertTrue(mock2.called)
+
+    @patch('graph_manager.applib.construct_message.Publisher.push')
+    @patch.object(GraphStore, 'graph_add')
+    @patch.object(GraphStore, 'graph_replace')
+    def test_replace_called_file_fail(self, mock1, mock2, publish_mock):
+        """Test if replace graph data was called."""
+        with open('tests/resources/message_data_file.json') as datafile:
+            message = json.load(datafile)
+        with self.assertRaises(IOError):
+            replace_message(message)
 
     @patch.object(GraphStore, 'graph_replace')
     def test_replace_error(self, mock):
