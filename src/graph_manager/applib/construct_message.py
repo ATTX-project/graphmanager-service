@@ -123,7 +123,7 @@ def retrieve_data(inputType, input_data):
     elif inputType == "URI":
         try:
             if urlparse(input_data).scheme in allowed:
-                request = s.get(input_data)
+                request = s.get(input_data, timeout=1)
                 return request.text
             elif urlparse(input_data).scheme in local:
                 s.mount('file://', FileAdapter())
