@@ -128,7 +128,7 @@ def retrieve_data(inputType, input_data):
             elif urlparse(input_data).scheme in local:
                 s.mount('file://', FileAdapter())
                 request = s.get(input_data)
-                handle_fileAdapter(request, input_data)
+                return handle_fileAdapter(request, input_data)
         except Exception as error:
             app_logger.error('Something is wrong: {0}'.format(error))
             raise
