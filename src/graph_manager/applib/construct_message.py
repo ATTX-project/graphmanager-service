@@ -29,7 +29,7 @@ def add_message(message_data):
         endTime = datetime.now().strftime('%Y-%m-%dT%H:%M:%S')
         PUBLISHER.push(prov_message(message_data, "success", startTime, endTime))
         app_logger.info('Stored graph data in: {0} graph'.format(target_graph))
-        return json.dumps(response_message(message_data["provenance"], "success"), sort_keys=True, indent=4, separators=(',', ': '))
+        return json.dumps(response_message(message_data["provenance"], "success"), indent=4, separators=(',', ': '))
     except Exception as error:
         endTime = datetime.now().strftime('%Y-%m-%dT%H:%M:%S')
         PUBLISHER.push(prov_message(message_data, "error", startTime, endTime))
@@ -71,7 +71,7 @@ def retrieve_message(message_data):
     output_obj = {"contentType": content_type,
                   "outputType": output_type,
                   "output": output}
-    return json.dumps(response_message(message_data["provenance"], output_obj), sort_keys=True, indent=4, separators=(',', ': '))
+    return json.dumps(response_message(message_data["provenance"], output_obj), indent=4, separators=(',', ': '))
 
 
 def replace_message(message_data):
