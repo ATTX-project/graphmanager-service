@@ -1,4 +1,4 @@
-import json
+# import json
 import requests
 from graph_manager.utils.logs import app_logger
 from datetime import datetime
@@ -52,7 +52,7 @@ def query_message(message_data):
     output_obj = {"contentType": content_type,
                   "outputType": output_type,
                   "output": output}
-    return response_message(message_data["provenance"], json.dumps(output_obj))
+    return response_message(message_data["provenance"], output_obj)
 
 
 def retrieve_message(message_data):
@@ -71,7 +71,7 @@ def retrieve_message(message_data):
     output_obj = {"contentType": content_type,
                   "outputType": output_type,
                   "output": output}
-    return response_message(message_data["provenance"], json.dumps(output_obj))
+    return response_message(message_data["provenance"], output_obj)
 
 
 def replace_message(message_data):
