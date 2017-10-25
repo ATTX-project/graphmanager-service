@@ -212,7 +212,7 @@ class Consumer(object):
             error_message = "Error Type: {0}, with message: {1}".format(e.__class__.__name__, e.message)
             processed_message = {"status": "Error",
                                  "statusMessage": error_message}
-            response = Message.create(message.channel, str(processed_message), properties)
+            response = Message.create(message.channel, str(json.dumps(processed_message, indent=4, separators=(',', ': '))), properties)
             response.publish(message.reply_to)
             message.reject(requeue=False)
         else:
