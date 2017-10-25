@@ -93,7 +93,7 @@ def replace_message(message_data):
         endTime = datetime.now().strftime('%Y-%m-%dT%H:%M:%S')
         PUBLISHER.push(prov_message(message_data, "success", startTime, endTime))
         app_logger.info('Replaced graph data in: {0} graph'.format(target_graph))
-        return response_message(message_data["provenance"], "success")
+        return json.dumps(response_message(message_data["provenance"], "success"), indent=4, separators=(',', ': '))
     except Exception as error:
         endTime = datetime.now().strftime('%Y-%m-%dT%H:%M:%S')
         PUBLISHER.push(prov_message(message_data, "error", startTime, endTime))
