@@ -182,7 +182,7 @@ def prov_message(message_data, status, startTime, endTime):
     message["payload"]["outputGraph"] = message_data["payload"]["graphManagerInput"]["targetGraph"]
     message["provenance"]["output"].append(output_data)
     app_logger.info('Construct provenance metadata for Graph Manager.')
-    return str(message)
+    return json.dumps(message)
 
 
 def response_message(provenance_data, output):
