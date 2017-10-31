@@ -1,8 +1,8 @@
 import unittest
 # from rdflib import Graph
 from mock import patch
-from graph_manager.utils.messaging import ScalableRpcServer, Consumer
-from graph_manager.utils.messaging_publish import Publisher
+from graph_manager.applib.messaging import ScalableRpcServer, Consumer
+from graph_manager.applib.messaging_publish import Publisher
 # from amqpstorm import Connection
 # from amqpstorm.tests.utility import FakeConnection
 # from amqpstorm import Channel

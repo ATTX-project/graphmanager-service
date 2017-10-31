@@ -4,7 +4,7 @@ import httpretty
 import json
 from falcon import testing
 from graph_manager.app import init_api
-from graph_manager.utils.graph_store import GraphStore
+from graph_manager.applib.graph_store import GraphStore
 from graph_manager.api.healthcheck import healthcheck_response
 from mock import patch
 

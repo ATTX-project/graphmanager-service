@@ -2,9 +2,9 @@ import json
 import requests
 from graph_manager.utils.logs import app_logger
 from datetime import datetime
-from graph_manager.utils.graph_store import GraphStore
+from graph_manager.applib.graph_store import GraphStore
 from graph_manager.utils.broker import broker
-from graph_manager.utils.messaging_publish import Publisher
+from graph_manager.applib.messaging_publish import Publisher
 from graph_manager.utils.file import results_path, file_extension
 from urlparse import urlparse
 from requests_file import FileAdapter

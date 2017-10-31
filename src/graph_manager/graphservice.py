@@ -2,7 +2,7 @@ import click
 import multiprocessing
 import gunicorn.app.base
 from graph_manager.app import init_api
-from graph_manager.utils.messaging import ScalableRpcServer
+from graph_manager.applib.messaging import ScalableRpcServer
 from graph_manager.utils.broker import broker
 from gunicorn.six import iteritems
 

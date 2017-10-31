@@ -3,7 +3,7 @@ import falcon
 from graph_manager.schemas import load_schema
 from graph_manager.utils.validate import validate
 from graph_manager.utils.logs import app_logger
-from graph_manager.utils.graph_store import GraphStore
+from graph_manager.applib.graph_store import GraphStore
 
 
 class GraphStatistics(object):

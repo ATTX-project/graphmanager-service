@@ -2,7 +2,7 @@ import click
 import unittest
 from graph_manager.app import init_api
 from click.testing import CliRunner
-from graph_manager.utils.messaging import ScalableRpcServer
+from graph_manager.applib.messaging import ScalableRpcServer
 from graph_manager.graphservice import GMApplication, number_of_workers, main, rpc
 from mock import patch
 

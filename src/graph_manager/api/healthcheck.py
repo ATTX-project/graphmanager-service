@@ -1,7 +1,7 @@
 import json
 import falcon
 from graph_manager.utils.logs import app_logger
-from graph_manager.utils.graph_store import GraphStore
+from graph_manager.applib.graph_store import GraphStore
 # from amqpstorm.management import ApiConnectionError
 # from amqpstorm.management import ApiError
 from amqpstorm.management import ManagementApi

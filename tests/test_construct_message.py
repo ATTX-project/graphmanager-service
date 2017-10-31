@@ -4,7 +4,7 @@ import httpretty
 from rdflib import Graph
 from graph_manager.applib.construct_message import replace_message, add_message, retrieve_message, query_message
 from mock import patch
-from graph_manager.utils.graph_store import GraphStore
+from graph_manager.applib.graph_store import GraphStore
 from amqpstorm import AMQPConnectionError
 
 
