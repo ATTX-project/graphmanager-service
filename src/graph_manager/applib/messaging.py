@@ -194,6 +194,8 @@ class Consumer(object):
             return str(retrieve_message(message_data))
         elif action == "replace":
             return str(replace_message(message_data))
+        else:
+            raise KeyError("Missing action or activity not specified.")
 
     def __call__(self, message):
         """Process the RPC Payload.
