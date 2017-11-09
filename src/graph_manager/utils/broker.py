@@ -1,7 +1,7 @@
-import os
+from os import environ
 
-broker = {'host': os.environ['MHOST'] if 'MHOST' in os.environ else "localhost",
-          'user': os.environ['MUSER'] if 'MUSER' in os.environ else "user",
-          'provqueue': os.environ['MPROVQUEUE'] if 'MPROVQUEUE' in os.environ else "provenance.inbox",
-          'rpcqueue': os.environ['MRPCQUEUE'] if 'MRPCQUEUE' in os.environ else "attx.graphManager.inbox",
-          'pass': os.environ['MKEY'] if 'MKEY' in os.environ else "password"}
+broker = {'host': environ['MHOST'] if 'MHOST' in environ else "localhost",
+          'user': environ['MUSER'] if 'MUSER' in environ else "user",
+          'provqueue': environ['MPROVQUEUE'] if 'MPROVQUEUE' in environ else "provenance.inbox",
+          'rpcqueue': environ['MRPCQUEUE'] if 'MRPCQUEUE' in environ else "attx.graphManager.inbox",
+          'pass': environ['MKEY'] if 'MKEY' in environ else "password"}
