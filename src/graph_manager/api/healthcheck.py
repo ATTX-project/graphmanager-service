@@ -2,8 +2,6 @@ import json
 import falcon
 from graph_manager.utils.logs import app_logger
 from graph_manager.applib.graph_store import GraphStore
-# from amqpstorm.management import ApiConnectionError
-# from amqpstorm.management import ApiError
 from amqpstorm.management import ManagementApi
 from graph_manager.utils.broker import broker
 
@@ -15,7 +13,7 @@ def healthcheck_response(api_status, graph):
     """Content and format health status response."""
     health_status = dict([('graphManagerService', api_status)])
     try:
-        graph.graph_health()
+        graph._graph_health()
     except Exception:
         health_status['graphStore'] = "Not Running"
     else:

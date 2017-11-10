@@ -17,7 +17,7 @@ class ConstructGraphTestCase(unittest.TestCase):
         self.request_address = "http://localhost:3030/ds"
         pass
 
-    @patch.object(GraphStore, 'graph_retrieve')
+    @patch.object(GraphStore, '_graph_retrieve')
     def test_retrieve_called(self, mock):
         """Test if retrieve graph data was called."""
         with open('tests/resources/graph_strategy.ttl') as datafile:
@@ -29,7 +29,7 @@ class ConstructGraphTestCase(unittest.TestCase):
         self.assertTrue(mock.called)
 
     @patch('graph_manager.applib.construct_message.results_path')
-    @patch.object(GraphStore, 'graph_sparql')
+    @patch.object(GraphStore, '_graph_sparql')
     @httpretty.activate
     def test_query_called(self, mock, file_mock):
         """Test if query graph data was called."""
@@ -50,7 +50,7 @@ class ConstructGraphTestCase(unittest.TestCase):
 
     @patch('graph_manager.applib.construct_message.Publisher.push')
     # @patch.object(GraphStore, 'graph_add')
-    @patch.object(GraphStore, 'graph_replace')
+    @patch.object(GraphStore, '_graph_replace')
     def test_replace_called(self, mock1, publish_mock):
         """Test if replace graph data was called."""
         with open('tests/resources/message_data.json') as datafile:
@@ -60,8 +60,8 @@ class ConstructGraphTestCase(unittest.TestCase):
         # self.assertTrue(mock2.called)
 
     @patch('graph_manager.applib.construct_message.Publisher.push')
-    @patch.object(GraphStore, 'graph_add')
-    @patch.object(GraphStore, 'graph_replace')
+    @patch.object(GraphStore, '_graph_add')
+    @patch.object(GraphStore, '_graph_replace')
     def test_replace_called_file_fail(self, mock1, mock2, publish_mock):
         """Test if replace graph data was called."""
         with open('tests/resources/message_data_file.json') as datafile:
@@ -69,7 +69,7 @@ class ConstructGraphTestCase(unittest.TestCase):
         with self.assertRaises(IOError):
             replace_message(message)
 
-    @patch.object(GraphStore, 'graph_replace')
+    @patch.object(GraphStore, '_graph_replace')
     def test_replace_error(self, mock):
         """Test if replace raises an error was called."""
         with open('tests/resources/message_data.json') as datafile:
@@ -78,7 +78,7 @@ class ConstructGraphTestCase(unittest.TestCase):
             replace_message(message)
 
     @patch('graph_manager.applib.construct_message.Publisher.push')
-    @patch.object(GraphStore, 'graph_add')
+    @patch.object(GraphStore, '_graph_add')
     def test_store_called(self, mock, publish_mock):
         """Test if store graph data was called."""
         with open('tests/resources/message_data_add.json') as datafile:
@@ -86,7 +86,7 @@ class ConstructGraphTestCase(unittest.TestCase):
         add_message(message)
         self.assertTrue(mock.called)
 
-    @patch.object(GraphStore, 'graph_add')
+    @patch.object(GraphStore, '_graph_add')
     def test_store_error(self, mock):
         """Test if store raises an error was called."""
         with open('tests/resources/message_data_add.json') as datafile:

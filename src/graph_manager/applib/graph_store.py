@@ -19,7 +19,7 @@ class GraphStore(object):
         self.server_address = "http://{0}:{1}/$/".format(self.host, self.port)
         self.request_address = "http://{0}:{1}/{2}".format(self.host, self.port, self.dataset)
 
-    def graph_health(self):
+    def _graph_health(self):
         """Do the Health check for Graph Store."""
         status = None
         try:
@@ -33,7 +33,7 @@ class GraphStore(object):
             status = True
         return status
 
-    def graph_list(self):
+    def _graph_list(self):
         """List Graph Store Named Graphs."""
         result = {}
         temp_list = []
@@ -52,7 +52,7 @@ class GraphStore(object):
         app_logger.info('Constructed list of Named graphs from "/{0}" dataset.'.format(self.dataset))
         return result
 
-    def graph_statistics(self):
+    def _graph_statistics(self):
         """Graph Store statistics agregated."""
         result = {}
         try:
@@ -66,14 +66,14 @@ class GraphStore(object):
         result['requests']['totalRequests'] = stats['datasets']['/{0}'.format(self.dataset)]['Requests']
         result['requests']['failedRequests'] = stats['datasets']['/{0}'.format(self.dataset)]['RequestsBad']
         triples = 0
-        graphs = self.graph_list()
+        graphs = self._graph_list()
         for e in graphs['graphs']:
             triples += int(e['tripleCount'])
         result['totalTriples'] = triples
         app_logger.info('Constructed statistics list for dataset: "/{0}".'.format(self.dataset))
         return result
 
-    def graph_retrieve(self, named_graph):
+    def _graph_retrieve(self, named_graph):
         """Retrieve named graph from Graph Store."""
         try:
             request = requests.get("{0}/data?graph={1}".format(self.request_address, named_graph))
@@ -87,7 +87,7 @@ class GraphStore(object):
             app_logger.info('Retrived named graph: {0} does not exist.'.format(named_graph))
             return None
 
-    def graph_sparql(self, source_graphs, query, content_type):
+    def _graph_sparql(self, source_graphs, query, content_type):
         """Execute SPARQL query on the Graph Store."""
         store_api = "{0}/query".format(self.request_address)
         return_type = {'application/sparql-results+xml': XML,
@@ -109,7 +109,7 @@ class GraphStore(object):
         else:
             return data.toxml()
 
-    def graph_add(self, named_graph, data, content_type):
+    def _graph_add(self, named_graph, data, content_type):
         """Update named graph in Graph Store."""
         headers = {'content-type': content_type,
                    'cache-control': "no-cache"}
@@ -121,7 +121,7 @@ class GraphStore(object):
         app_logger.info('Updated named graph: {0}.'.format(named_graph))
         return request.json()
 
-    def graph_replace(self, named_graph, data, content_type):
+    def _graph_replace(self, named_graph, data, content_type):
         """Update named graph in Graph Store."""
         headers = {'content-type': content_type,
                    'cache-control': "no-cache"}
@@ -133,7 +133,7 @@ class GraphStore(object):
         app_logger.info('Replaced named graph: {0}.'.format(named_graph))
         return request.json()
 
-    def drop_graph(self, named_graph):
+    def _drop_graph(self, named_graph):
         """Drop named graph from Graph Store."""
         drop_query = quote(" DROP GRAPH <{0}>".format(named_graph))
         payload = "update={0}".format(drop_query)
