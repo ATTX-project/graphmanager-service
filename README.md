@@ -3,14 +3,14 @@
 Current directory contains:
 * graphmanager-service implementation in `src/graph_manager` folder
 
-VERSION: 0.2
+VERSION: `0.2`
 
 ### Docker container
 
 Using the Graph Manager Service Docker container:
-* `docker pull attxproject/gm-api` in the current folder;
-* running the container `docker run -d -p 4302:4302 attxproject/gm-api` runs the container in detached mode on the `4302` port (production version should have this port hidden);
-* using the endpoints `http://localhost:4302/$versionNb/index` or `http://localhost:4302/$versionNb/clusterids` or the other listed below.
+* `docker pull attxproject/gm-api:dev` in the current folder;
+* running the container `docker run -d -p 4302:4302 attxproject/gm-api:dev` runs the container in detached mode on the `4302` port (production version should have this port hidden);
+* using the endpoints e.g. `http://localhost:4302/$versionNb/health` or the other listed below.
 
 The version number is specified in `src/graph_manager/app.py` under `version` variable.
 
@@ -53,10 +53,8 @@ http://localhost:4302/$versionNb/index
 
 The Swagger definition lives here:`swagger-gmAPI.yml`.
 
-
 ## Running Tests
 
 In order work/generate tests:
+* using Gradle: `gradle build` will run the tests automatically, and `gradle build` coverage will generate coverage report
 * use the command: `py.test tests` in the `graph_manager` folder
-* coverage: `py.test --cov-report html --cov=graph_manager tests/` in the `graph_manager` folder
-* generate cover report `py.test tests --html=build/test-report/index.html --self-contained-html` - this will generate a `build/test-report/index.html` folder that contains html based information about the tests coverage.

@@ -55,7 +55,7 @@ dependencies {
     python 'pypi:pbr:3.1.1'
     python 'pypi:pytz:2016.4'
     python 'pypi:jsonschema:2.6.0'
-    python 'pypi:falcon:1.2.0'
+    python 'pypi:falcon:1.3.0'
     python 'pypi:SPARQLWrapper:1.8.0'
     python 'pypi:rdflib:4.2.2'
     python 'pypi:rdflib-jsonld:0.4.0'
