@@ -3,14 +3,14 @@
 Current directory contains:
 * graphmanager-service implementation in `src/graph_manager` folder
 
-VERSION: 0.2
+VERSION: `0.2`
 
 ### Docker container
 
 Using the Graph Manager Service Docker container:
-* `docker pull attxproject/gm-api` in the current folder;
-* running the container `docker run -d -p 4302:4302 attxproject/gm-api` runs the container in detached mode on the `4302` port (production version should have this port hidden);
-* using the endpoints `http://localhost:4302/$versionNb/index` or `http://localhost:4302/$versionNb/clusterids` or the other listed below.
+* `docker pull attxproject/gm-api:dev` in the current folder;
+* running the container `docker run -d -p 4302:4302 attxproject/gm-api:dev` runs the container in detached mode on the `4302` port (production version should have this port hidden);
+* using the endpoints e.g. `http://localhost:4302/$versionNb/health` or the other listed below.
 
 The version number is specified in `src/graph_manager/app.py` under `version` variable.
 
@@ -18,7 +18,7 @@ The version number is specified in `src/graph_manager/app.py` under `version` va
 
 The Graph Manager manages interaction with the Graph Store and retrieving statistics about it (e.g. list of named graphs, number of queries) and also it communicates with UnifiedViews plugins about the graph data information in the Graph Store.
 
-The Graph Manager Service requires python 2.7 installed.
+Full information on how to run and work with the Graph Manager Service available at: https://attx-project.github.io/Service-Graph-Manager.html
 
 ## API Endpoints
 
@@ -27,6 +27,11 @@ The Graph Manager REST API has the following endpoints:
 * `health` - checks if the application is running.
 
 ## Develop
+
+### Requirements
+1. Python 2.7
+2. Gradle 3.0+ https://gradle.org/
+3. Pypi Ivy repository either a local one (see https://github.com/linkedin/pygradle/blob/master/docs/pivy-importer.md for more information) or you can deploy your own version using https://github.com/blankdots/ivy-pypi-repo
 
 ### Building the Artifact with Gradle
 
@@ -45,18 +50,6 @@ python src/graph_manager/graphservice.py server
 python src/graph_manager/graphservice.py rpc
 ```
 
-For testing purposes the application requires a running Fuseki, one can make a request to the address below to view pipelines and associated steps:
-
-```
-http://localhost:4302/$versionNb/index
-```
+For testing purposes the application requires a running Fuseki, RabbitMQ. Also the health endpoint provides information on running services the service has detected: `http://localhost:4302/health`
 
 The Swagger definition lives here:`swagger-gmAPI.yml`.
-
-
-## Running Tests
-
-In order work/generate tests:
-* use the command: `py.test tests` in the `graph_manager` folder
-* coverage: `py.test --cov-report html --cov=graph_manager tests/` in the `graph_manager` folder
-* generate cover report `py.test tests --html=build/test-report/index.html --self-contained-html` - this will generate a `build/test-report/index.html` folder that contains html based information about the tests coverage.

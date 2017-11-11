@@ -25,7 +25,7 @@ def add_message(message_data):
         for graph in source_graphs:
             content_type = graph["contentType"]
             data = retrieve_data(graph["inputType"], graph["input"])
-            storage.graph_add(target_graph, data, content_type)
+            storage._graph_add(target_graph, data, content_type)
         endTime = datetime.now().strftime('%Y-%m-%dT%H:%M:%S')
         PUBLISHER.push(prov_message(message_data, "success", startTime, endTime))
         app_logger.info('Stored graph data in: {0} graph'.format(target_graph))
@@ -44,7 +44,7 @@ def query_message(message_data):
     query = message_data["payload"]["graphManagerInput"]["input"]
     output_type = message_data["payload"]["graphManagerInput"]["outputType"]
     content_type = message_data["payload"]["graphManagerInput"]["contentType"]
-    request = storage.graph_sparql(source_graphs, query, content_type)
+    request = storage._graph_sparql(source_graphs, query, content_type)
     if output_type == "URI":
         output = results_path(request, file_extension(content_type))
     elif output_type == "Data":
@@ -63,7 +63,7 @@ def retrieve_message(message_data):
     output_type = message_data["payload"]["graphManagerInput"]["outputType"]
     content_type = message_data["payload"]["graphManagerInput"]["contentType"]
     for graph in source_graphs:
-        result_graph.parse(data=storage.graph_retrieve(graph), format="turtle")
+        result_graph.parse(data=storage._graph_retrieve(graph), format="turtle")
     if output_type == "URI":
         output = results_path(result_graph.serialize(format=content_type), file_extension(content_type))
     elif output_type == "Data":
@@ -85,11 +85,11 @@ def replace_message(message_data):
         first_graph = next(iter(source_graphs or []), None)
         first_graph_content_type = first_graph["contentType"]
         first_graph_data = retrieve_data(first_graph["inputType"], first_graph["input"])
-        storage.graph_replace(target_graph, first_graph_data, first_graph_content_type)
+        storage._graph_replace(target_graph, first_graph_data, first_graph_content_type)
         for graph in source_graphs[1:]:
             content_type = graph["contentType"]
             data = retrieve_data(graph["inputType"], graph["input"])
-            storage.graph_add(target_graph, data, content_type)
+            storage._graph_add(target_graph, data, content_type)
         endTime = datetime.now().strftime('%Y-%m-%dT%H:%M:%S')
         PUBLISHER.push(prov_message(message_data, "success", startTime, endTime))
         app_logger.info('Replaced graph data in: {0} graph'.format(target_graph))
@@ -101,7 +101,7 @@ def replace_message(message_data):
         raise
 
 
-def handle_fileAdapter(request, input_data):
+def handle_file_adapter(request, input_data):
     """Handle file adapter response."""
     if request.status_code == 404:
         raise IOError("Something went wrong with retrieving the file: {0}. It does not exist!".format(input_data))
@@ -113,14 +113,14 @@ def handle_fileAdapter(request, input_data):
         return request.text
 
 
-def retrieve_data(inputType, input_data):
+def retrieve_data(input_type, input_data):
     """Retrieve data from a specific URI."""
     s = requests.Session()
     allowed = ('http', 'https', 'ftp')
     local = ('file')
-    if inputType == "Data":
+    if input_type == "Data":
         return input_data
-    elif inputType == "URI":
+    elif input_type == "URI":
         try:
             if urlparse(input_data).scheme in allowed:
                 request = s.get(input_data, timeout=1)
@@ -128,13 +128,13 @@ def retrieve_data(inputType, input_data):
             elif urlparse(input_data).scheme in local:
                 s.mount('file://', FileAdapter())
                 request = s.get(input_data)
-                return handle_fileAdapter(request, input_data)
+                return handle_file_adapter(request, input_data)
         except Exception as error:
             app_logger.error('Something is wrong: {0}'.format(error))
             raise
 
 
-def prov_message(message_data, status, startTime, endTime):
+def prov_message(message_data, status, start_time, end_time):
     """Construct GM related provenance message."""
     message = dict()
     message["provenance"] = dict()
@@ -142,14 +142,14 @@ def prov_message(message_data, status, startTime, endTime):
     message["provenance"]["agent"]["ID"] = artifact_id
     message["provenance"]["agent"]["role"] = agent_role
 
-    activityID = message_data["provenance"]["context"]["activityID"]
-    workflowID = message_data["provenance"]["context"]["workflowID"]
+    activity_id = message_data["provenance"]["context"]["activityID"]
+    workflow_id = message_data["provenance"]["context"]["workflowID"]
 
     prov_message = message["provenance"]
 
     prov_message["context"] = dict()
-    prov_message["context"]["activityID"] = str(activityID)
-    prov_message["context"]["workflowID"] = str(workflowID)
+    prov_message["context"]["activityID"] = str(activity_id)
+    prov_message["context"]["workflowID"] = str(workflow_id)
     if message_data["provenance"]["context"].get('stepID'):
         prov_message["context"]["stepID"] = message_data["provenance"]["context"]["stepID"]
 
@@ -157,8 +157,8 @@ def prov_message(message_data, status, startTime, endTime):
     prov_message["activity"]["type"] = "ServiceExecution"
     prov_message["activity"]["title"] = "Graph Manager Operations."
     prov_message["activity"]["status"] = status
-    prov_message["activity"]["startTime"] = startTime
-    prov_message["activity"]["endTime"] = endTime
+    prov_message["activity"]["startTime"] = start_time
+    prov_message["activity"]["endTime"] = end_time
     message["provenance"]["input"] = []
     message["provenance"]["output"] = []
     message["payload"] = {}
@@ -193,14 +193,14 @@ def response_message(provenance_data, output):
     message["provenance"]["agent"]["ID"] = artifact_id
     message["provenance"]["agent"]["role"] = agent_role
 
-    activityID = provenance_data["context"]["activityID"]
-    workflowID = provenance_data["context"]["workflowID"]
+    activity_id = provenance_data["context"]["activityID"]
+    workflow_id = provenance_data["context"]["workflowID"]
 
     prov_message = message["provenance"]
 
     prov_message["context"] = dict()
-    prov_message["context"]["activityID"] = str(activityID)
-    prov_message["context"]["workflowID"] = str(workflowID)
+    prov_message["context"]["activityID"] = str(activity_id)
+    prov_message["context"]["workflowID"] = str(workflow_id)
     if provenance_data["context"].get('stepID'):
         prov_message["context"]["stepID"] = provenance_data["context"]["stepID"]
     message["payload"] = dict()
