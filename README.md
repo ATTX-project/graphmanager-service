@@ -18,7 +18,7 @@ The version number is specified in `src/graph_manager/app.py` under `version` va
 
 The Graph Manager manages interaction with the Graph Store and retrieving statistics about it (e.g. list of named graphs, number of queries) and also it communicates with UnifiedViews plugins about the graph data information in the Graph Store.
 
-The Graph Manager Service requires python 2.7 installed.
+Full information on how to run and work with the Graph Manager Service available at: https://attx-project.github.io/Service-Graph-Manager.html
 
 ## API Endpoints
 
@@ -27,6 +27,11 @@ The Graph Manager REST API has the following endpoints:
 * `health` - checks if the application is running.
 
 ## Develop
+
+### Requirements
+1. Python 2.7
+2. Gradle 3.0+ https://gradle.org/
+3. Pypi Ivy repository either a local one (see https://github.com/linkedin/pygradle/blob/master/docs/pivy-importer.md for more information) or you can deploy your own version using https://github.com/blankdots/ivy-pypi-repo
 
 ### Building the Artifact with Gradle
 
@@ -45,16 +50,6 @@ python src/graph_manager/graphservice.py server
 python src/graph_manager/graphservice.py rpc
 ```
 
-For testing purposes the application requires a running Fuseki, one can make a request to the address below to view pipelines and associated steps:
-
-```
-http://localhost:4302/$versionNb/index
-```
+For testing purposes the application requires a running Fuseki, RabbitMQ. Also the health endpoint provides information on running services the service has detected: `http://localhost:4302/health`
 
 The Swagger definition lives here:`swagger-gmAPI.yml`.
-
-## Running Tests
-
-In order work/generate tests:
-* using Gradle: `gradle build` will run the tests automatically, and `gradle build` coverage will generate coverage report
-* use the command: `py.test tests` in the `graph_manager` folder
