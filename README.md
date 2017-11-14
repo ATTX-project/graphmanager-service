@@ -10,7 +10,7 @@ VERSION: `0.2`
 Using the Graph Manager Service Docker container:
 * `docker pull attxproject/gm-api:dev` in the current folder;
 * running the container `docker run -d -p 4302:4302 attxproject/gm-api:dev` runs the container in detached mode on the `4302` port (production version should have this port hidden);
-* using the endpoints e.g. `http://localhost:4302/$versionNb/health` or the other listed below.
+* using the endpoints e.g. `http://localhost:4302/{versionNb}/{endpoint}` or the other listed below.
 
 The version number is specified in `src/graph_manager/app.py` under `version` variable.
 
