@@ -209,6 +209,8 @@ class GraphTestCase(GraphStoreTest):
         fuseki = GraphStore()
         result = fuseki._graph_sparql(url, list_query, 'application/sparql-results+xml')
         assert(result == graph_data)
+        httpretty.disable()
+        httpretty.reset()
 
     @responses.activate
     def test_graph_sparql_bad(self):

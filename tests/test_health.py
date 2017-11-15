@@ -32,19 +32,23 @@ class TestGM(appHealthTest):
     @httpretty.activate
     def test_health_ok(self):
         """Test GET health is ok."""
-        httpretty.register_uri(httpretty.GET, "http://localhost:4032/health", status=200)
+        httpretty.register_uri(httpretty.GET, "http://localhost:4302/health", status=200)
         result = self.simulate_get('/health')
         assert(result.status == falcon.HTTP_200)
+        httpretty.disable()
+        httpretty.reset()
 
     @httpretty.activate
     def test_health_response(self):
         """Response to healthcheck endpoint."""
         fuseki = GraphStore()
         httpretty.register_uri(httpretty.GET, "http://localhost:3030/{0}/ping".format("$"), "2017-09-18T11:41:19.915+00:00", status=200)
-        httpretty.register_uri(httpretty.GET, "http://localhost:7030/health", status=200)
+        httpretty.register_uri(httpretty.GET, "http://localhost:4302/health", status=200)
         response = healthcheck_response("Running", fuseki)
         result = self.simulate_get('/health')
         assert(result.content == response)
+        httpretty.disable()
+        httpretty.reset()
 
     @patch('graph_manager.api.healthcheck.healthcheck_response')
     def test_actual_health_response(self, mock):

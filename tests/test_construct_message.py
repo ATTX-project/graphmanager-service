@@ -47,6 +47,8 @@ class ConstructGraphTestCase(unittest.TestCase):
         mock.return_value = graph_data
         query_message(message)
         self.assertTrue(mock.called)
+        httpretty.disable()
+        httpretty.reset()
 
     @patch('graph_manager.applib.construct_message.Publisher.push')
     # @patch.object(GraphStore, 'graph_add')

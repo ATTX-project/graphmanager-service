@@ -155,6 +155,8 @@ class GraphTestCase(GraphStoreTest):
         httpretty.register_uri(httpretty.GET, request_url, graph_data, status=200, content_type="application/sparql-results+xml")
         result = self.simulate_post('/{0}/graph/query'.format(self.version), body=graph_query)
         assert(result.text == graph_data)
+        httpretty.disable()
+        httpretty.reset()
 
     @responses.activate
     def test_api_update_no_data(self):
