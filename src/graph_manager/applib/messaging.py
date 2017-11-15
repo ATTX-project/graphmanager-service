@@ -5,7 +5,9 @@ import amqpstorm
 from amqpstorm import Message
 from amqpstorm import Connection
 from graph_manager.utils.logs import app_logger
-from graph_manager.applib.construct_message import add_message, query_message, replace_message, retrieve_message
+from graph_manager.applib.construct_message import retrieve_message, query_message
+from graph_manager.applib.construct_message import replace_message, add_message
+from graph_manager.applib.construct_message import construct_message
 
 
 class ScalableRpcServer(object):
@@ -194,6 +196,8 @@ class Consumer(object):
             return str(retrieve_message(message_data))
         elif action == "replace":
             return str(replace_message(message_data))
+        elif action == "construct":
+            return str(construct_message(message_data))
         else:
             raise KeyError("Missing action or activity not specified.")
 

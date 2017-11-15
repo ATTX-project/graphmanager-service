@@ -79,6 +79,20 @@ class GraphSPARQL(object):
         fuseki = GraphStore()
         data = fuseki._graph_sparql(parsed['targetGraph'], parsed['query'], parsed["contentType"])
         resp.data = str(data)
-        resp.content_type = 'application/xml'  # for now just this type
+        resp.content_type = parsed["contentType"]
         resp.status = falcon.HTTP_200
         app_logger.info('Finished operations on /graph/query POST Request.')
+
+
+class GraphSPARQLConstruct(object):
+    """Execute SPARQL Construct Query on Graph Store."""
+
+    @validate(load_schema('query'))
+    def on_post(self, req, resp, parsed):
+        """Execution of the POST SPARQL query request."""
+        fuseki = GraphStore()
+        data = fuseki._graph_construct(parsed['targetGraph'], parsed['query'], parsed["contentType"])
+        resp.data = str(data)
+        resp.content_type = parsed["contentType"]
+        resp.status = falcon.HTTP_200
+        app_logger.info('Finished operations on /graph/construct POST Request.')

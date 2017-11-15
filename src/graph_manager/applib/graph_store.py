@@ -103,11 +103,28 @@ class GraphStore(object):
         except Exception as error:
             app_logger.error('Something is wrong: {0}'.format(error))
             raise
-        app_logger.info('Execture SPARQL query on named graph: {0}.'.format(named_graph))
+        app_logger.info('Execture SPARQL query on named graphs: {0}.'.format(source_graphs))
         if return_type[content_type] == JSON:
             return data
         else:
             return data.toxml()
+
+    def _graph_construct(self, source_graphs, query, content_type):
+        """Execute SPARQL query on the Graph Store."""
+        store_api = "{0}/query".format(self.request_address)
+        try:
+            sparql = SPARQLWrapper(store_api)
+            # add a default graph, though that can also be in the query string
+            for named_graph in source_graphs:
+                sparql.addDefaultGraph(named_graph)
+            sparql.setReturnFormat(XML)
+            sparql.setQuery(query)
+            data = sparql.query().convert().serialize(format=content_type)
+        except Exception as error:
+            app_logger.error('Something is wrong: {0}'.format(error))
+            raise
+        app_logger.info('Execture SPARQL Construct on named graphs: {0}.'.format(source_graphs))
+        return data
 
     def _graph_add(self, named_graph, data, content_type):
         """Update named graph in Graph Store."""

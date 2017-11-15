@@ -55,6 +55,24 @@ def query_message(message_data):
     return json.dumps(response_message(message_data["provenance"], output_obj), sort_keys=True, indent=4, separators=(',', ': '))
 
 
+def construct_message(message_data):
+    """Query named graph in Graph Store."""
+    storage = GraphStore()
+    source_graphs = message_data["payload"]["graphManagerInput"]["sourceGraphs"]
+    query = message_data["payload"]["graphManagerInput"]["input"]
+    output_type = message_data["payload"]["graphManagerInput"]["outputType"]
+    content_type = message_data["payload"]["graphManagerInput"]["contentType"]
+    request = storage._graph_construct(source_graphs, query, content_type)
+    if output_type == "URI":
+        output = results_path(request, file_extension(content_type))
+    elif output_type == "Data":
+        output = request
+    output_obj = {"contentType": content_type,
+                  "outputType": output_type,
+                  "output": output}
+    return json.dumps(response_message(message_data["provenance"], output_obj), sort_keys=True, indent=4, separators=(',', ': '))
+
+
 def retrieve_message(message_data):
     """Retrieve named graph from Graph Store."""
     storage = GraphStore()
