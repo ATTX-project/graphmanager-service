@@ -9,7 +9,7 @@ from amqpstorm import AMQPConnectionError
 
 
 class ConstructGraphTestCase(unittest.TestCase):
-    """Test for Provenance function."""
+    """Test for Construct Graph messages function."""
 
     def setUp(self):
         """Set up test fixtures."""

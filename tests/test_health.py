@@ -10,7 +10,7 @@ from mock import patch
 
 
 class appHealthTest(testing.TestCase):
-    """Testing GM prov function and initialize it for that purpose."""
+    """Testing GM health API."""
 
     def setUp(self):
         """Setting the app up."""
@@ -21,7 +21,7 @@ class appHealthTest(testing.TestCase):
         pass
 
 
-class TestProv(appHealthTest):
+class TestGM(appHealthTest):
     """Testing if there is a health endoint available."""
 
     def test_create(self):
