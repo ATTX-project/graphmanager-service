@@ -8,7 +8,7 @@
     },
     "payload": {
         "graphManagerInput": {
-          "activity": "query",
+          "task": "query",
           "contentType": "application/sparql-results+xml",
           "outputType": "Data",
           "sourceGraphs": ["http://data.hulib.helsinki.fi/attx/strategy", "http://data.hulib.helsinki.fi/attx/attx-onto"],

@@ -10,8 +10,9 @@ from urlparse import urlparse
 from requests_file import FileAdapter
 from rdflib.graph import Graph
 
-artifact_id = 'GraphManager'  # Define the GraphManager agent
-agent_role = 'storage'  # Define Agent type
+artifact_id = "GraphManager"  # Define the GraphManager agent
+agent_role = "storage"  # Define Agent type
+output_key = "graphManagerOutput"
 
 
 def add_message(message_data):
@@ -49,10 +50,7 @@ def query_message(message_data):
         output = results_path(request, file_extension(content_type))
     elif output_type == "Data":
         output = request
-    output_obj = {"contentType": content_type,
-                  "outputType": output_type,
-                  "output": output}
-    return json.dumps(response_message(message_data["provenance"], output_obj), sort_keys=True, indent=4, separators=(',', ': '))
+    return json.dumps(response_message(message_data["provenance"], status="success", output=output), sort_keys=True, indent=4, separators=(',', ': '))
 
 
 def construct_message(message_data):
@@ -67,10 +65,7 @@ def construct_message(message_data):
         output = results_path(request, file_extension(content_type))
     elif output_type == "Data":
         output = request
-    output_obj = {"contentType": content_type,
-                  "outputType": output_type,
-                  "output": output}
-    return json.dumps(response_message(message_data["provenance"], output_obj), sort_keys=True, indent=4, separators=(',', ': '))
+    return json.dumps(response_message(message_data["provenance"], status="success", output=output), sort_keys=True, indent=4, separators=(',', ': '))
 
 
 def retrieve_message(message_data):
@@ -86,10 +81,7 @@ def retrieve_message(message_data):
         output = results_path(result_graph.serialize(format=content_type), file_extension(content_type))
     elif output_type == "Data":
         output = result_graph.serialize(format=content_type)
-    output_obj = {"contentType": content_type,
-                  "outputType": output_type,
-                  "output": output}
-    return json.dumps(response_message(message_data["provenance"], output_obj), indent=4, separators=(',', ': '))
+    return json.dumps(response_message(message_data["provenance"], status="success", output=output), indent=4, separators=(',', ': '))
 
 
 def replace_message(message_data):
@@ -111,7 +103,7 @@ def replace_message(message_data):
         endTime = datetime.now().strftime('%Y-%m-%dT%H:%M:%S')
         PUBLISHER.push(prov_message(message_data, "success", startTime, endTime))
         app_logger.info('Replaced graph data in: {0} graph'.format(target_graph))
-        return json.dumps(response_message(message_data["provenance"], "success"), indent=4, separators=(',', ': '))
+        return json.dumps(response_message(message_data["provenance"], status="success"), indent=4, separators=(',', ': '))
     except Exception as error:
         endTime = datetime.now().strftime('%Y-%m-%dT%H:%M:%S')
         PUBLISHER.push(prov_message(message_data, "error", startTime, endTime))
@@ -203,7 +195,7 @@ def prov_message(message_data, status, start_time, end_time):
     return json.dumps(message)
 
 
-def response_message(provenance_data, output):
+def response_message(provenance_data, status, status_messsage=None, output=None):
     """Construct Graph Manager response."""
     message = dict()
     message["provenance"] = dict()
@@ -222,5 +214,9 @@ def response_message(provenance_data, output):
     if provenance_data["context"].get('stepID'):
         prov_message["context"]["stepID"] = provenance_data["context"]["stepID"]
     message["payload"] = dict()
-    message["payload"]["graphManagerOutput"] = output
+    message["payload"]["status"] = status
+    if status_messsage:
+        message["payload"]["statusMessage"] = status_messsage
+    if output:
+        message["payload"][output_key] = output
     return message

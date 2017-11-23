@@ -8,7 +8,7 @@
     },
     "payload": {
         "graphManagerInput": {
-          "activity": "retrieve",
+          "task": "retrieve",
           "contentType": "text/turtle",
           "outputType": "Data",
           "sourceGraphs":
