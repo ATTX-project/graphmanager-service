@@ -14,7 +14,7 @@
               "type": "string"
             },
             "activityID": {
-              "type": "integer"
+              "type": "string"
             },
             "stepID": {
               "type": "string"
