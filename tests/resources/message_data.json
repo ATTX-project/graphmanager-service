@@ -8,7 +8,7 @@
     },
     "payload": {
         "graphManagerInput": {
-          "activity": "replace",
+          "task": "replace",
           "targetGraph": "default",
           "sourceData":
           [

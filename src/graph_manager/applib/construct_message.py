@@ -44,7 +44,7 @@ def query_message(message_data):
     source_graphs = message_data["payload"]["graphManagerInput"]["sourceGraphs"]
     query = message_data["payload"]["graphManagerInput"]["input"]
     output_type = message_data["payload"]["graphManagerInput"]["outputType"]
-    content_type = message_data["payload"]["graphManagerInput"]["contentType"]
+    content_type = message_data["payload"]["graphManagerInput"]["outputContentType"]
     request = storage._graph_sparql(source_graphs, query, content_type)
     if output_type == "URI":
         output = results_path(request, file_extension(content_type))
@@ -59,7 +59,7 @@ def construct_message(message_data):
     source_graphs = message_data["payload"]["graphManagerInput"]["sourceGraphs"]
     query = message_data["payload"]["graphManagerInput"]["input"]
     output_type = message_data["payload"]["graphManagerInput"]["outputType"]
-    content_type = message_data["payload"]["graphManagerInput"]["contentType"]
+    content_type = message_data["payload"]["graphManagerInput"]["outputContentType"]
     request = storage._graph_construct(source_graphs, query, content_type)
     if output_type == "URI":
         output = results_path(request, file_extension(content_type))
@@ -74,7 +74,7 @@ def retrieve_message(message_data):
     result_graph = Graph()
     source_graphs = message_data["payload"]["graphManagerInput"]["sourceGraphs"]
     output_type = message_data["payload"]["graphManagerInput"]["outputType"]
-    content_type = message_data["payload"]["graphManagerInput"]["contentType"]
+    content_type = message_data["payload"]["graphManagerInput"]["outputContentType"]
     for graph in source_graphs:
         result_graph.parse(data=storage._graph_retrieve(graph), format="turtle")
     if output_type == "URI":

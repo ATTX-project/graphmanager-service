@@ -9,7 +9,7 @@
     "payload": {
         "graphManagerInput": {
           "task": "query",
-          "contentType": "application/sparql-results+xml",
+          "outputContentType": "application/sparql-results+xml",
           "outputType": "Data",
           "sourceGraphs": ["http://data.hulib.helsinki.fi/attx/strategy", "http://data.hulib.helsinki.fi/attx/attx-onto"],
           "input": "SELECT ?subject ?predicate ?object WHERE { ?subject ?predicate ?object} LIMIT 25"
