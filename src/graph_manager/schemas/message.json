@@ -32,7 +32,7 @@
     },
     "payload": {
       "type": "object",
-      "additionalProperties": false,
+      "additionalProperties": true,
       "properties": {
         "graphManagerInput": {
           "type": "object",
