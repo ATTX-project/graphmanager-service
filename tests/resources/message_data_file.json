@@ -1,0 +1,29 @@
+{
+    "provenance": {
+        "context": {
+            "workflowID": "wf",
+            "activityID": 1,
+            "stepID": "stepid"
+        }
+    },
+    "payload": {
+        "graphManagerInput": {
+          "task": "replace",
+          "targetGraph": "default",
+          "sourceData":
+          [
+            {
+              "contentType": "text/turtle",
+              "inputType": "URI",
+              "input": "file:///example.ttl"
+            },
+            {
+              "contentType": "application/n-triples",
+              "inputType": "Data",
+              "input": "<http://example.org/#spiderman> <http://www.perceive.net/schemas/relationship/enemyOf> <http://example.org/#green-goblin> ."
+
+            }
+          ]
+        }
+    }
+}

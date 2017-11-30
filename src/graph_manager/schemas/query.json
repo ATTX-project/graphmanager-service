@@ -1,15 +1,19 @@
 {
     "properties": {
-        "namedGraph": {
-            "type": "string"
+        "targetGraph": {
+            "type": "array"
         },
         "query": {
+            "type": "string"
+        },
+        "contentType": {
             "type": "string"
         }
     },
     "required": [
         "query",
-        "namedGraph"
+        "targetGraph",
+        "contentType"
     ],
     "type": "object"
 }

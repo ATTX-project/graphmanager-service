@@ -5,7 +5,12 @@ import amqpstorm
 from amqpstorm import Message
 from amqpstorm import Connection
 from graph_manager.utils.logs import app_logger
-from graph_manager.applib.construct_message import store_graph, query_graph, replace_graph, retrieve_graph
+from graph_manager.applib.construct_message import retrieve_message, query_message
+from graph_manager.applib.construct_message import replace_message, add_message
+from graph_manager.applib.construct_message import construct_message
+from graph_manager.applib.construct_message import response_message
+from graph_manager.utils.validate import valid_message
+from graph_manager.schemas import load_schema
 
 
 class ScalableRpcServer(object):
@@ -182,6 +187,24 @@ class Consumer(object):
         if self.channel:
             self.channel.close()
 
+    @valid_message(load_schema('message'))
+    def _handle_message(self, message):
+        """Handle graph manager messages."""
+        message_data = json.loads(message.body)
+        action = message_data["payload"]["graphManagerInput"]["task"]
+        if action == "add":
+            return str(add_message(message_data))
+        elif action == "query":
+            return str(query_message(message_data))
+        elif action == "retrieve":
+            return str(retrieve_message(message_data))
+        elif action == "replace":
+            return str(replace_message(message_data))
+        elif action == "construct":
+            return str(construct_message(message_data))
+        else:
+            raise KeyError("Missing action or task not specified.")
+
     def __call__(self, message):
         """Process the RPC Payload.
 
@@ -189,23 +212,22 @@ class Consumer(object):
         :return:
         """
         try:
-            message_data = json.loads(message.body)
-            action = message_data["payload"]["graphManagerInput"]["activity"]
-            if action == "add":
-                response = str(store_graph(message_data))
-            elif action == "query":
-                response = str(query_graph(message_data))
-            elif action == "retrieve":
-                response = str(retrieve_graph(message_data))
-            elif action == "replace":
-                response = str(replace_graph(message_data))
+            processed_message = self._handle_message(message)
+        except Exception as e:
+            app_logger.error('Something went wrong: {0}'.format(e))
             properties = {
                 'correlation_id': message.correlation_id
             }
-
-            response = Message.create(message.channel, response, properties)
+            error_message = "Error Type: {0}, with message: {1}".format(e.__class__.__name__, e.message)
+            message_data = json.loads(message.body)
+            processed_message = response_message(message_data["provenance"], status="error", status_messsage=error_message)
+            response = Message.create(message.channel, str(json.dumps(processed_message, indent=4, separators=(',', ': '))), properties)
             response.publish(message.reply_to)
-
+            message.reject(requeue=False)
+        else:
+            properties = {
+                'correlation_id': message.correlation_id
+            }
+            response = Message.create(message.channel, processed_message, properties)
+            response.publish(message.reply_to)
             message.ack()
-        except Exception as e:
-            app_logger.error('Something went wrong: {0}'.format(e))

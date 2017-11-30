@@ -1,0 +1,59 @@
+{
+  "type": "object",
+  "additionalProperties": false,
+  "properties": {
+    "provenance": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "context": {
+          "type": "object",
+          "additionalProperties": true,
+          "properties": {
+            "workflowID": {
+              "type": "string"
+            },
+            "activityID": {
+              "type": "string"
+            },
+            "stepID": {
+              "type": "string"
+            }
+          },
+          "required": [
+            "workflowID",
+            "activityID"
+          ]
+        }
+      },
+      "required": [
+        "context"
+      ]
+    },
+    "payload": {
+      "type": "object",
+      "additionalProperties": true,
+      "properties": {
+        "graphManagerInput": {
+          "type": "object",
+          "additionalProperties": true,
+          "properties": {
+            "task": {
+              "type": "string"
+            }
+          },
+          "required": [
+            "task"
+          ]
+        }
+      },
+      "required": [
+        "graphManagerInput"
+      ]
+    }
+  },
+  "required": [
+    "provenance",
+    "payload"
+  ]
+}

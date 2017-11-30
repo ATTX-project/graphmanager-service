@@ -1,15 +1,19 @@
 {
     "properties": {
-        "namedGraph": {
+        "targetGraph": {
             "type": "string"
         },
         "triples": {
+            "type": "string"
+        },
+        "contentType": {
             "type": "string"
         }
     },
     "required": [
         "triples",
-        "namedGraph"
+        "targetGraph",
+        "contentType"
     ],
     "type": "object"
 }
