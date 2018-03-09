@@ -39,7 +39,7 @@ class GraphResource(object):
         fuseki = GraphStore()
         response = fuseki._graph_retrieve(graph_uri)
         if response is not None:
-            resp.data = str(response)
+            resp.data = response
             resp.content_type = 'text/turtle'
             app_logger.info('Retrieved: {0}.'.format(graph_uri))
             resp.status = falcon.HTTP_200
