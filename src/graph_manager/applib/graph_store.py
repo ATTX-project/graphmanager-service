@@ -82,7 +82,7 @@ class GraphStore(object):
             raise
         if request.status_code == 200:
             app_logger.info('Retrived named graph: {0}.'.format(named_graph))
-            return request.text
+            return request.content
         elif request.status_code == 404:
             app_logger.info('Retrived named graph: {0} does not exist.'.format(named_graph))
             return None
