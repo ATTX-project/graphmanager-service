@@ -141,7 +141,6 @@ def retrieve_data(input_type, input_data):
             elif urlparse(input_data).scheme in local:
                 s.mount('file://', FileAdapter())
                 request = s.get(input_data)
-                request.encoding("utf8")
                 print("Input data")
                 print(input_data)
                 print("Request")
