@@ -123,13 +123,12 @@ def handle_file_adapter(request, input_data):
         raise IOError("Something went wrong with retrieving the file: {0}. General IOError!".format(input_data))
     elif request.status_code == 200:
         print(request)
-        return request.text
+        return request.content
 
 
 def retrieve_data(input_type, input_data):
     """Retrieve data from a specific URI."""
     s = requests.Session()
-    print(input_data)
     allowed = ('http', 'https', 'ftp')
     local = ('file')
     if input_type == "Data":
@@ -142,7 +141,10 @@ def retrieve_data(input_type, input_data):
             elif urlparse(input_data).scheme in local:
                 s.mount('file://', FileAdapter())
                 request = s.get(input_data)
+                request.encoding("utf8")
+                print("Input data")
                 print(input_data)
+                print("Request")
                 print(request)
                 return handle_file_adapter(request, input_data)
         except Exception as error:
