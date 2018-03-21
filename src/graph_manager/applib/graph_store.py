@@ -143,6 +143,7 @@ class GraphStore(object):
         headers = {'content-type': content_type,
                    'cache-control': "no-cache"}
         try:
+            print(data)
             request = requests.put("{0}?graph={1}".format(self.request_address, named_graph), data=data, headers=headers)
         except Exception as error:
             app_logger.error('Something is wrong: {0}'.format(error))
