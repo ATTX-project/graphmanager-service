@@ -95,12 +95,10 @@ def replace_message(message_data):
         first_graph = next(iter(source_graphs or []), None)
         first_graph_content_type = first_graph["contentType"]
         first_graph_data = retrieve_data(first_graph["inputType"], first_graph["input"])
-        print(first_graph_data)
         storage._graph_replace(target_graph, first_graph_data, first_graph_content_type)
         for graph in source_graphs[1:]:
             content_type = graph["contentType"]
             data = retrieve_data(graph["inputType"], graph["input"])
-            print(data)
             storage._graph_add(target_graph, data, content_type)
         endTime = datetime.now().strftime('%Y-%m-%dT%H:%M:%S')
         PUBLISHER.push(prov_message(message_data, "success", startTime, endTime))
@@ -122,7 +120,6 @@ def handle_file_adapter(request, input_data):
     elif request.status_code == 400:
         raise IOError("Something went wrong with retrieving the file: {0}. General IOError!".format(input_data))
     elif request.status_code == 200:
-        print(request)
         return request.content
 
 
@@ -141,10 +138,6 @@ def retrieve_data(input_type, input_data):
             elif urlparse(input_data).scheme in local:
                 s.mount('file://', FileAdapter())
                 request = s.get(input_data)
-                print("Input data")
-                print(input_data)
-                print("Request")
-                print(request)
                 return handle_file_adapter(request, input_data)
         except Exception as error:
             app_logger.error('Something is wrong: {0}'.format(error))
