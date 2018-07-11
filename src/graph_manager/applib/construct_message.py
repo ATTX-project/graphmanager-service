@@ -120,7 +120,7 @@ def handle_file_adapter(request, input_data):
     elif request.status_code == 400:
         raise IOError("Something went wrong with retrieving the file: {0}. General IOError!".format(input_data))
     elif request.status_code == 200:
-        return request.text
+        return request.content
 
 
 def retrieve_data(input_type, input_data):
